@@ -11,20 +11,11 @@ router.get('/', (req, res) => {
   res.send('App is running..');
 });
 
-//Create new record
-router.post('/add', (req, res) => {
-  res.send('New record added.');
-});
+router.get('/:userid/accept',(req,res) => {
+  const userId = req.params.userid;
 
-//delete existing record
-router.delete('/', (req, res) => {
-  res.send('Deleted existing record');
-});
-
-//updating existing record
-router.put('/', (req, res) => {
-  res.send('Updating existing record');
-});
+  res.send(`User Id: ${userId} has accepted`);
+})
 
 //showing demo records
 router.get('/demo', (req, res) => {
