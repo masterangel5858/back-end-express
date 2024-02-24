@@ -4,8 +4,6 @@ const app = express();
 const { MongoClient } = require('mongodb');
 const router = express.Router();
 
-let records = [];
-
 //Get all students
 router.get('/', (req, res) => {
   res.send('App is running..');
@@ -16,6 +14,14 @@ router.get('/:userid/accept',(req,res) => {
 
   res.send(`User Id: ${userId} has accepted`);
 })
+
+router.get('/:userid/snooze',(req,res) => {
+  const userId = req.params.userid;
+
+  res.send(`User Id: ${userId} has snooze`);
+})
+
+
 
 //showing demo records
 router.get('/demo', (req, res) => {
