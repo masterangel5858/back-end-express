@@ -4,7 +4,7 @@ const app = express();
 const { MongoClient } = require('mongodb');
 const router = express.Router();
 const { getdata } = require('./findmongodb.js');
-const { insertData } = require('./insertData.js'); // Assuming you have an insertData function
+const { insertData } = require('./insertmongodb.js'); // Assuming you have an insertData function
 
 // Get all students
 router.get('/', (req, res) => {
