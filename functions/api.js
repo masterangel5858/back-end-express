@@ -35,9 +35,9 @@ router.get('/:userid/:time/accept', async (req, res) => {
     // Insert data into the database
     await insertData(filteredMedicine);
 
-    // Construct the absolute URL for the success page
+
     const host = req.headers.host;
-    const successUrl = `https://${host}/.netlify/functions/api/templates/success.html`;
+    const successUrl = `https://${host}/.netlify/functions/api/success`;
 
     // Redirect to the success page
     res.redirect(successUrl);
@@ -45,6 +45,11 @@ router.get('/:userid/:time/accept', async (req, res) => {
     console.error("Error:", error);
     res.status(500).send("An unexpected error occurred.");
   }
+});
+
+router.get('/success', (req, res) => {
+  const successFilePath = path.join(__dirname, 'templates', 'success.html');
+  res.sendFile(successFilePath);
 });
 
 // Mount the router
