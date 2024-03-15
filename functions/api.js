@@ -12,8 +12,7 @@ router.get('/:userid/:time/accept', async (req, res) => {
 
   try {
     // Send the loading page
-    const loadingPath = path.join(__dirname, 'templates', 'loading.html');
-    res.sendFile(loadingPath);
+    res.status(202).json({ message: "Request received. Processing..." });
 
     // Fetch medicine data for the specified user ID
     const medicineData = await getdata(userId);
