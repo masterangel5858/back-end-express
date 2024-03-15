@@ -9,8 +9,9 @@ router.get('/', (req, res) => {
   res.send('App is running..');
 });
 
-router.get('/:userid/accept',(req,res) => {
+router.get('/:userid/:time/accept',(req,res) => {
   const userId = req.params.userid;
+  const time = req.params.time;
 
   res.send(`User Id: ${userId} has accepted`);
 })
