@@ -22,18 +22,3 @@ async function insertData(data) {
         await client.close();
     }
 }
-
-// Example data to insert
-const newData = {
-    LineID: "U123456",
-    MedicName: "New Medicine",
-    Morning: true,
-    Noon: false,
-    Evening: true,
-    afbf: "Before",
-    MedicPicture: "https://example.com/medicine.jpg",
-    Status: "Enable"
-};
-
-// Call the insertData function with the example data
-insertData(newData);
