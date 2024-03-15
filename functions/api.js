@@ -8,54 +8,57 @@ const path = require('path');
 
 // Function to handle the accept request
 async function handleAcceptRequest(userId, time, res) {
-    try {
-        // Fetch medicine data for the specified user ID
-        const medicineData = await getdata(userId);
+  try {
+      console.log('Fetching medicine data...');
+      const medicineData = await getdata(userId);
 
-        if (!medicineData) {
-            return res.status(404).send(`No medicine data found for user ID: ${userId}`);
-        }
+      if (!medicineData) {
+          console.log(`No medicine data found for user ID: ${userId}`);
+          return res.status(404).send(`No medicine data found for user ID: ${userId}`);
+      }
 
-        // Filter medicine based on the time
-        const filteredMedicine = medicineData.Medicine.filter(medicine => {
-            return (time === 'Morning' && medicine.Morning) ||
-                   (time === 'Noon' && medicine.Noon) ||
-                   (time === 'Evening' && medicine.Evening);
-        });
+      // Filter medicine based on the time
+      const filteredMedicine = medicineData.Medicine.filter(medicine => {
+          return (time === 'Morning' && medicine.Morning) ||
+                 (time === 'Noon' && medicine.Noon) ||
+                 (time === 'Evening' && medicine.Evening);
+      });
 
-        if (filteredMedicine.length === 0) {
-            return res.send(`No medicine found for ${time}`);
-        }
+      if (filteredMedicine.length === 0) {
+          console.log(`No medicine found for ${time}`);
+          return res.send(`No medicine found for ${time}`);
+      }
 
-        // Get the current time in the format "hour:minute" in 24-hour format
-        const currentTime = new Date().toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Bangkok' });
+      console.log('Inserting medicine data into the database...');
+      // Insert each medicine into the database
+      const currentTime = new Date().toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Bangkok' });
+      const insertedMedicines = [];
+      for (const medicine of filteredMedicine) {
+          const newMedicineData = {
+              LineID: userId,
+              MedicName: medicine.MedicName,
+              Morning: medicine.Morning,
+              Noon: medicine.Noon,
+              Evening: medicine.Evening,
+              afbf: medicine.afbf,
+              MedicPicture: medicine.MedicPicture,
+              status: medicine.Status,
+              timestamp: currentTime
+          };
+          await insertData(newMedicineData);
+          insertedMedicines.push(newMedicineData);
+      }
 
-        // Insert each medicine into the database
-        const insertedMedicines = [];
-        for (const medicine of filteredMedicine) {
-            const newMedicineData = {
-                LineID: userId,
-                MedicName: medicine.MedicName,
-                Morning: medicine.Morning,
-                Noon: medicine.Noon,
-                Evening: medicine.Evening,
-                afbf: medicine.afbf,
-                MedicPicture: medicine.MedicPicture,
-                status: medicine.Status,
-                timestamp: currentTime
-            };
-            await insertData(newMedicineData);
-            insertedMedicines.push(newMedicineData);
-        }
-
-        // Resend the success page
-        const successFilePath = path.join(__dirname, 'templates', 'success.html');
-        return res.sendFile(successFilePath);
-    } catch (error) {
-        console.error("Error:", error);
-        return res.status(500).send("An unexpected error occurred.");
-    }
+      console.log('Medicine data inserted successfully!');
+      // Resend the success page
+      const successFilePath = path.join(__dirname, 'templates', 'success.html');
+      return res.sendFile(successFilePath);
+  } catch (error) {
+      console.error("Error:", error);
+      return res.status(500).send("An unexpected error occurred.");
+  }
 }
+
 
 // Route to handle the accept request
 router.get('/:userid/:time/accept', async (req, res) => {
