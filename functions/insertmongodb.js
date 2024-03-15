@@ -22,3 +22,7 @@ async function insertData(data) {
         await client.close();
     }
 }
+
+module.exports = {
+    insertData
+};
