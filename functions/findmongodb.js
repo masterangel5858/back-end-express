@@ -45,7 +45,7 @@ async function getdata(userid) {
     }
 }
 
-module.export = {
+module.exports = {
     getdata,
     getMedicine
 };
