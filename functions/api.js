@@ -7,7 +7,8 @@ const { getdata } = require('./findmongodb.js')
 //Get all students
 router.get('/', (req, res) => {
   res.send('App is running..');
-});router.get('/:userid/:time/accept', async (req, res) => {
+});
+router.get('/:userid/:time/accept', async (req, res) => {
   const userId = req.params.userid;
   const time = req.params.time;
 
@@ -19,20 +20,22 @@ router.get('/', (req, res) => {
           return res.status(404).send(`No medicine data found for user ID: ${userId}`);
       }
 
-      res.send(`Medicine data found for user ID: ${userId}. Medicine data: ${JSON.stringify(medicineData)}`);
+      // Log medicine data
+      console.log(`Medicine data found for user ID: ${userId}. Medicine data:`, medicineData);
 
       // Filter medicine based on the time
-      const filteredMedicine = [];
-
-      medicineData.forEach(medicine => {
-          if ((time === 'Morning' && medicine.Morning) ||
-              (time === 'Noon:' && medicine.Noon) ||
-              (time === 'Evening' && medicine.Evening)) {
-              filteredMedicine.push(medicine);
-          }
+      const filteredMedicine = medicineData.Medicine.filter(medicine => {
+          return (time === 'Morning' && medicine.Morning) ||
+                 (time === 'Noon' && medicine.Noon) ||
+                 (time === 'Evening' && medicine.Evening);
       });
 
-      res.send(`Filtered medicine for ${time}: ${JSON.stringify(filteredMedicine)}`);
+      // Log filtered medicine
+      console.log(`Filtered medicine for ${time}:`, filteredMedicine);
+
+      if (filteredMedicine.length === 0) {
+          return res.send(`No medicine found for ${time}`);
+      }
 
       // Create a new table in the database to store the filtered medicine data
       const newTableData = filteredMedicine.map(medicine => ({
@@ -50,9 +53,11 @@ router.get('/', (req, res) => {
 
       res.send(`User Id: ${userId} has accepted in ${time}. Filtered medicine data: ${JSON.stringify(newTableData)}`);
   } catch (error) {
+      console.error("Error:", error);
       res.status(500).send("An unexpected error occurred.");
   }
 });
+
 
 
 
