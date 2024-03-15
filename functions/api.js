@@ -36,21 +36,14 @@ router.get('/:userid/:time/accept', async (req, res) => {
     await insertData(filteredMedicine);
 
 
-    const host = req.headers.host;
-    const successUrl = `https://${host}/.netlify/functions/api/success`;
-
-    // Redirect to the success page
-    res.redirect(successUrl);
+    const successFilePath = path.join(__dirname, 'templates', 'success.html');
+    res.sendFile(successFilePath);
   } catch (error) {
     console.error("Error:", error);
     res.status(500).send("An unexpected error occurred.");
   }
 });
 
-router.get('/success', (req, res) => {
-  const successFilePath = path.join(__dirname, 'templates', 'success.html');
-  res.sendFile(successFilePath);
-});
 
 // Mount the router
 app.use('/.netlify/functions/api', router);
