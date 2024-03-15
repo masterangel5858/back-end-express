@@ -24,11 +24,11 @@ router.get('/:userid/:time/accept', async (req, res) => {
       const filteredMedicine = [];
 
       medicineData.forEach(medicine => {
-          if (time === 'morning' && medicine.Morning) {
+          if (time === 'Morning' && medicine.Morning) {
               filteredMedicine.push(medicine);
-          } else if (time === 'noon' && medicine.Noon) {
+          } else if (time === 'Noon:' && medicine.Noon) {
               filteredMedicine.push(medicine);
-          } else if (time === 'evening' && medicine.Evening) {
+          } else if (time === 'Evening' && medicine.Evening) {
               filteredMedicine.push(medicine);
           }
       });
@@ -36,7 +36,7 @@ router.get('/:userid/:time/accept', async (req, res) => {
       // Create a new table in the database to store the filtered medicine data
       const newTableData = filteredMedicine.map(medicine => ({
           LineID: userId,
-          Medicinename: medicine.MedicName,
+          MedicName: medicine.MedicName,
           Morning: medicine.Morning,
           Noon: medicine.Noon,
           Evening: medicine.Evening,
