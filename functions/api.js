@@ -12,7 +12,7 @@ router.get('/:userid/:time/accept', async (req, res) => {
 
   try {
     // Send the loading page
-    res.status(202).json({ message: "Request received. Processing..." });
+    res.sendFile(path.join(__dirname, 'templates', 'loading.html'));
 
     // Fetch medicine data for the specified user ID
     const medicineData = await getdata(userId);
@@ -55,7 +55,8 @@ router.get('/:userid/:time/accept', async (req, res) => {
 
     // Send the success page after completing the operations
     const successFilePath = path.join(__dirname, 'templates', 'success.html');
-    return res.sendFile(successFilePath);
+    res.sendFile(successFilePath);
+
   } catch (error) {
     console.error("Error:", error);
     res.status(500).send("An unexpected error occurred.");
