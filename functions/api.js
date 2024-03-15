@@ -7,8 +7,7 @@ const { getdata } = require('./findmongodb.js')
 //Get all students
 router.get('/', (req, res) => {
   res.send('App is running..');
-});
-router.get('/:userid/:time/accept', async (req, res) => {
+});router.get('/:userid/:time/accept', async (req, res) => {
   const userId = req.params.userid;
   const time = req.params.time;
 
@@ -17,29 +16,23 @@ router.get('/:userid/:time/accept', async (req, res) => {
       const medicineData = await getdata(userId);
 
       if (!medicineData) {
-          console.log(`No medicine data found for user ID: ${userId}`);
           return res.status(404).send(`No medicine data found for user ID: ${userId}`);
       }
 
-      console.log(`Medicine data found for user ID: ${userId}`);
-      console.log("Medicine data:", medicineData);
+      res.send(`Medicine data found for user ID: ${userId}. Medicine data: ${JSON.stringify(medicineData)}`);
 
       // Filter medicine based on the time
       const filteredMedicine = [];
 
       medicineData.forEach(medicine => {
-          console.log(`Processing medicine: ${medicine._id}`);
-
-          if (time === 'Morning' && medicine.Morning) {
-              filteredMedicine.push(medicine);
-          } else if (time === 'Noon:' && medicine.Noon) {
-              filteredMedicine.push(medicine);
-          } else if (time === 'Evening' && medicine.Evening) {
+          if ((time === 'Morning' && medicine.Morning) ||
+              (time === 'Noon:' && medicine.Noon) ||
+              (time === 'Evening' && medicine.Evening)) {
               filteredMedicine.push(medicine);
           }
       });
 
-      console.log(`Filtered medicine for ${time}:`, filteredMedicine);
+      res.send(`Filtered medicine for ${time}: ${JSON.stringify(filteredMedicine)}`);
 
       // Create a new table in the database to store the filtered medicine data
       const newTableData = filteredMedicine.map(medicine => ({
@@ -57,10 +50,10 @@ router.get('/:userid/:time/accept', async (req, res) => {
 
       res.send(`User Id: ${userId} has accepted in ${time}. Filtered medicine data: ${JSON.stringify(newTableData)}`);
   } catch (error) {
-      console.error("Error:", error);
-      res.status(500).send("Internal Server Error");
+      res.status(500).send("An unexpected error occurred.");
   }
 });
+
 
 
 
