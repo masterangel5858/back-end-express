@@ -4,6 +4,7 @@ const app = express();
 const router = express.Router();
 const { insertData } = require('./insertmongodb');
 const {getdata} = require('./findmongodb')
+const path = require('path');
 
 // Route to handle the request
 router.get('/:userid/:time/accept', async (req, res) => {
@@ -12,7 +13,7 @@ router.get('/:userid/:time/accept', async (req, res) => {
 
   try {
       // Show the loading page while processing
-      res.sendFile('./templates/loading.html');
+      res.sendFile(path.join(__dirname, 'templates', 'loading.html'));
 
       // Fetch medicine data for the specified user ID
       const medicineData = await getdata(userId);
@@ -29,7 +30,7 @@ router.get('/:userid/:time/accept', async (req, res) => {
       });
 
       if (filteredMedicine.length === 0) {
-          return res.sendFile('./templates/no-medicine.html');
+          return res.sendFile(path.join(__dirname, 'templates', 'no-medicine.html'));
       }
 
       // Insert data into the database
@@ -37,7 +38,7 @@ router.get('/:userid/:time/accept', async (req, res) => {
 
       // Redirect to the success page after 5 seconds
       setTimeout(function() {
-        res.redirect('./templates/success.html');
+        res.redirect(path.join(__dirname, 'templates', 'success.html'));
       }, 5000);
       
   } catch (error) {
