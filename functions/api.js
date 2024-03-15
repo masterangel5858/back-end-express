@@ -41,7 +41,7 @@ router.get('/:userid/:time/accept', async (req, res) => {
     }
 
     // Get the current time in the format "hour:minute" in 24-hour format
-    const currentTime = new Date().toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' });
+    const currentTime = new Date().toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' ,timeZone: 'Asia/Bangkok' });
 
     // Insert each medicine into the database
     const insertedMedicines = [];
