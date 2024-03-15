@@ -13,7 +13,7 @@ router.get('/:userid/:time/accept',(req,res) => {
   const userId = req.params.userid;
   const time = req.params.time;
 
-  res.send(`User Id: ${userId} has accepted`);
+  res.send(`User Id: ${userId} has accepted in ${time} `);
 })
 
 router.get('/:userid/snooze',(req,res) => {
