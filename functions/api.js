@@ -4,15 +4,17 @@ const app = express();
 const router = express.Router();
 const { getdata } = require('./findmongodb.js');
 const { insertData } = require('./insertmongodb.js');
-const path = require('path');
+const path = require('path'); // Import the path module
 
 router.get('/:userid/:time/accept', async (req, res) => {
   const userId = req.params.userid;
   const time = req.params.time;
 
   try {
-    const loadingpath = path.join(__dirname, 'templates', 'loading.html');
-    res.sendFile(loadingpath);
+    // Send the loading page
+    const loadingPath = path.join(__dirname, 'templates', 'loading.html');
+    res.sendFile(loadingPath);
+
     // Fetch medicine data for the specified user ID
     const medicineData = await getdata(userId);
 
@@ -52,7 +54,7 @@ router.get('/:userid/:time/accept', async (req, res) => {
       insertedMedicines.push(newMedicineData);
     }
 
-    // Resend the success page
+    // Send the success page after completing the operations
     const successFilePath = path.join(__dirname, 'templates', 'success.html');
     return res.sendFile(successFilePath);
   } catch (error) {
