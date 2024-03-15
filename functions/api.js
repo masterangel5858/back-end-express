@@ -3,68 +3,72 @@ const serverless = require('serverless-http');
 const app = express();
 const { MongoClient } = require('mongodb');
 const router = express.Router();
-const { getdata } = require('./findmongodb.js')
-//Get all students
+const { getdata } = require('./findmongodb.js');
+const { insertData } = require('./insertData.js'); // Assuming you have an insertData function
+
+// Get all students
 router.get('/', (req, res) => {
   res.send('App is running..');
 });
+
 router.get('/:userid/:time/accept', async (req, res) => {
   const userId = req.params.userid;
   const time = req.params.time;
 
   try {
-      // Fetch medicine data for the specified user ID
-      const medicineData = await getdata(userId);
+    // Fetch medicine data for the specified user ID
+    const medicineData = await getdata(userId);
 
-      if (!medicineData) {
-          return res.status(404).send(`No medicine data found for user ID: ${userId}`);
-      }
+    if (!medicineData) {
+      return res.status(404).send(`No medicine data found for user ID: ${userId}`);
+    }
 
-      // Log medicine data
-      console.log(`Medicine data found for user ID: ${userId}. Medicine data:`, medicineData);
+    // Log medicine data
+    console.log(`Medicine data found for user ID: ${userId}. Medicine data:`, medicineData);
 
-      // Filter medicine based on the time
-      const filteredMedicine = medicineData.Medicine.filter(medicine => {
-          return (time === 'Morning' && medicine.Morning) ||
-                 (time === 'Noon' && medicine.Noon) ||
-                 (time === 'Evening' && medicine.Evening);
-      });
+    // Filter medicine based on the time
+    const filteredMedicine = medicineData.Medicine.filter(medicine => {
+      return (time === 'Morning' && medicine.Morning) ||
+             (time === 'Noon' && medicine.Noon) ||
+             (time === 'Evening' && medicine.Evening);
+    });
 
-      // Log filtered medicine
-      console.log(`Filtered medicine for ${time}:`, filteredMedicine);
+    // Log filtered medicine
+    console.log(`Filtered medicine for ${time}:`, filteredMedicine);
 
-      if (filteredMedicine.length === 0) {
-          return res.send(`No medicine found for ${time}`);
-      }
-      const currentTime = new Date().toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' });
+    if (filteredMedicine.length === 0) {
+      return res.send(`No medicine found for ${time}`);
+    }
 
-      // Create a new table in the database to store the filtered medicine data
-      const newTableData = filteredMedicine.map(medicine => ({
-          LineID: userId,
-          MedicName: medicine.MedicName,
-          Morning: medicine.Morning,
-          Noon: medicine.Noon,
-          Evening: medicine.Evening,
-          afbf: medicine.afbf,
-          MedicPicture: medicine.MedicPicture,
-          status: medicine.Status,
-          timestamp: currentTime
-      }));
+    // Get the current time in the format "hour:minute" in 24-hour format
+    const currentTime = new Date().toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' });
 
-      // Save newTableData to the database (implementation depends on your database setup)
+    // Insert each medicine into the database
+    const insertedMedicines = [];
+    for (const medicine of filteredMedicine) {
+      const newMedicineData = {
+        LineID: userId,
+        MedicName: medicine.MedicName,
+        Morning: medicine.Morning,
+        Noon: medicine.Noon,
+        Evening: medicine.Evening,
+        afbf: medicine.afbf,
+        MedicPicture: medicine.MedicPicture,
+        status: medicine.Status,
+        timestamp: currentTime
+      };
+      await insertData(newMedicineData);
+      insertedMedicines.push(newMedicineData);
+    }
 
-      res.send(`User Id: ${userId} has accepted in ${time}. Filtered medicine data: ${JSON.stringify(newTableData)}`);
+    res.send(`User Id: ${userId} has accepted in ${time}. Filtered medicine data: ${JSON.stringify(insertedMedicines)}`);
   } catch (error) {
-      console.error("Error:", error);
-      res.status(500).send("An unexpected error occurred.");
+    console.error("Error:", error);
+    res.status(500).send("An unexpected error occurred.");
   }
 });
 
-
-
-
-
-//showing demo records
+// Showing demo records
 router.get('/demo', (req, res) => {
   res.json([
     {
