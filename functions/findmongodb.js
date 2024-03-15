@@ -3,6 +3,7 @@ const { MongoClient } = require("mongodb");
 const url = "mongodb+srv://admin:1234@healthcaredemo.nlwfzbm.mongodb.net/?retryWrites=true&w=majority";
 const client = new MongoClient(url);
 const dbName = "HealthCare";
+
 async function getMedicine(userId) {
     try {
         await client.connect();
@@ -31,6 +32,7 @@ async function getMedicine(userId) {
         await client.close();
     }
 }
+
 /**
  * find Med data that contain userid
  * @param {string} userId 
@@ -42,6 +44,7 @@ async function getdata(userId) {
         return medicines;
     } catch (error) {
         console.error("Error fetching medicine data:", error);
+        throw error; // Re-throw the error to handle it outside the function
     }
 }
 
@@ -49,4 +52,6 @@ module.exports = {
     getdata,
     getMedicine
 };
-// Call the fetchMedicine function with the userid
+
+// Don't forget to call the function if needed
+// getdata('userId'); // Replace 'userId' with the actual user ID
