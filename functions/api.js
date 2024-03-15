@@ -1,93 +1,52 @@
 const express = require('express');
 const serverless = require('serverless-http');
 const app = express();
-const { MongoClient } = require('mongodb');
 const router = express.Router();
-const { getdata } = require('./findmongodb.js');
-const { insertData } = require('./insertmongodb.js'); // Assuming you have an insertData function
+const { insertData } = require('./insertmongodb');
 
-// Get all students
-router.get('/', (req, res) => {
-  res.send('App is running..');
-});
-
+// Route to handle the request
 router.get('/:userid/:time/accept', async (req, res) => {
   const userId = req.params.userid;
   const time = req.params.time;
 
   try {
-    // Fetch medicine data for the specified user ID
-    const medicineData = await getdata(userId);
+      // Show the loading page while processing
+      res.sendFile('loading.html', { root: __dirname });
 
-    if (!medicineData) {
-      return res.status(404).send(`No medicine data found for user ID: ${userId}`);
-    }
+      // Fetch medicine data for the specified user ID
+      const medicineData = await getdata(userId);
 
-    // Log medicine data
-    console.log(`Medicine data found for user ID: ${userId}. Medicine data:`, medicineData);
+      if (!medicineData) {
+          return res.status(404).send(`No medicine data found for user ID: ${userId}`);
+      }
 
-    // Filter medicine based on the time
-    const filteredMedicine = medicineData.Medicine.filter(medicine => {
-      return (time === 'Morning' && medicine.Morning) ||
-             (time === 'Noon' && medicine.Noon) ||
-             (time === 'Evening' && medicine.Evening);
-    });
+      // Filter medicine based on the time
+      const filteredMedicine = medicineData.Medicine.filter(medicine => {
+          return (time === 'Morning' && medicine.Morning) ||
+                 (time === 'Noon' && medicine.Noon) ||
+                 (time === 'Evening' && medicine.Evening);
+      });
 
-    // Log filtered medicine
-    console.log(`Filtered medicine for ${time}:`, filteredMedicine);
+      if (filteredMedicine.length === 0) {
+          return res.sendFile('no-medicine.html', { root: __dirname });
+      }
 
-    if (filteredMedicine.length === 0) {
-      return res.send(`No medicine found for ${time}`);
-    }
+      // Insert data into the database
+      await insertData(filteredMedicine);
 
-    // Get the current time in the format "hour:minute" in 24-hour format
-    const currentTime = new Date().toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' ,timeZone: 'Asia/Bangkok' });
-
-    // Insert each medicine into the database
-    const insertedMedicines = [];
-    for (const medicine of filteredMedicine) {
-      const newMedicineData = {
-        LineID: userId,
-        MedicName: medicine.MedicName,
-        Morning: medicine.Morning,
-        Noon: medicine.Noon,
-        Evening: medicine.Evening,
-        afbf: medicine.afbf,
-        MedicPicture: medicine.MedicPicture,
-        status: medicine.Status,
-        timestamp: currentTime
-      };
-      await insertData(newMedicineData);
-      insertedMedicines.push(newMedicineData);
-    }
-
-    res.send(`User Id: ${userId} has accepted in ${time}. Filtered medicine data: ${JSON.stringify(insertedMedicines)}`);
+      // Redirect to the success page after 5 seconds
+      setTimeout(function() {
+        res.redirect('/success.html');
+      }, 5000);
+      
   } catch (error) {
-    console.error("Error:", error);
-    res.status(500).send("An unexpected error occurred.");
+      console.error("Error:", error);
+      res.status(500).send("An unexpected error occurred.");
   }
 });
 
-// Showing demo records
-router.get('/demo', (req, res) => {
-  res.json([
-    {
-      id: '001',
-      name: 'Smith',
-      email: 'smith@gmail.com',
-    },
-    {
-      id: '002',
-      name: 'Sam',
-      email: 'sam@gmail.com',
-    },
-    {
-      id: '003',
-      name: 'lily',
-      email: 'lily@gmail.com',
-    },
-  ]);
-});
-
+// Mount the router
 app.use('/.netlify/functions/api', router);
+
+// Export the server
 module.exports.handler = serverless(app);
