@@ -6,6 +6,8 @@ const { getdata } = require('./findmongodb.js');
 const { insertData } = require('./insertmongodb.js');
 const path = require('path'); // Import the path module
 
+router 
+
 router.get('/:userid/:time/accept', async (req, res) => {
   const userId = req.params.userid;
   const time = req.params.time;
@@ -57,6 +59,26 @@ router.get('/:userid/:time/accept', async (req, res) => {
   } catch (error) {
     console.error("Error:", error);
     res.status(500).send("An unexpected error occurred.");
+  }
+});
+
+router.get('/getdatamed/:userid', async (req, res) => {
+  const userId = req.params.userid;
+
+  try {
+      // Fetch all medicine data for the specified user ID
+      const medicineData = await getdata(userId);
+      
+      if (!medicineData) {
+          console.log(`No medicine data found for user ID: ${userId}`);
+          return res.status(404).send(`No medicine data found for user ID: ${userId}`);
+      }
+
+      // Send the fetched medicine data as a response
+      return res.json(medicineData);
+  } catch (error) {
+      console.error("Error:", error);
+      return res.status(500).send("An unexpected error occurred.");
   }
 });
 
