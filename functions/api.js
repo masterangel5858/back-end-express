@@ -4,7 +4,7 @@ const app = express();
 const { MongoClient } = require('mongodb');
 const router = express.Router();
 const { getdata } = require('./findmongodb.js');
-const { insertData } = require('./insertmongodb.js'); // Assuming you have an insertData function
+const { insertData } = require('./insertData.js'); // Assuming you have an insertData function
 
 // Get all students
 router.get('/', (req, res) => {
@@ -23,18 +23,12 @@ router.get('/:userid/:time/accept', async (req, res) => {
       return res.status(404).send(`No medicine data found for user ID: ${userId}`);
     }
 
-    // Log medicine data
-    console.log(`Medicine data found for user ID: ${userId}. Medicine data:`, medicineData);
-
     // Filter medicine based on the time
     const filteredMedicine = medicineData.Medicine.filter(medicine => {
       return (time === 'Morning' && medicine.Morning) ||
              (time === 'Noon' && medicine.Noon) ||
              (time === 'Evening' && medicine.Evening);
     });
-
-    // Log filtered medicine
-    console.log(`Filtered medicine for ${time}:`, filteredMedicine);
 
     if (filteredMedicine.length === 0) {
       return res.send(`No medicine found for ${time}`);
