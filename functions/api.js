@@ -6,44 +6,44 @@ const { insertData } = require('./insertmongodb');
 const {getdata} = require('./findmongodb')
 const path = require('path');
 
-// Route to handle the request
 router.get('/:userid/:time/accept', async (req, res) => {
   const userId = req.params.userid;
   const time = req.params.time;
 
   try {
-      // Show the loading page while processing
-      res.sendFile(path.join(__dirname, 'templates', 'loading.html'));
+    // Show the loading page while processing
+    res.sendFile(path.join(__dirname, 'templates', 'loading.html'));
 
-      // Fetch medicine data for the specified user ID
-      const medicineData = await getdata(userId);
+    // Fetch medicine data for the specified user ID
+    const medicineData = await getdata(userId);
 
-      if (!medicineData) {
-          return res.status(404).send(`No medicine data found for user ID: ${userId}`);
-      }
+    if (!medicineData) {
+      return res.status(404).send(`No medicine data found for user ID: ${userId}`);
+    }
 
-      // Filter medicine based on the time
-      const filteredMedicine = medicineData.Medicine.filter(medicine => {
-          return (time === 'Morning' && medicine.Morning) ||
-                 (time === 'Noon' && medicine.Noon) ||
-                 (time === 'Evening' && medicine.Evening);
-      });
+    // Filter medicine based on the time
+    const filteredMedicine = medicineData.Medicine.filter(medicine => {
+      return (time === 'Morning' && medicine.Morning) ||
+             (time === 'Noon' && medicine.Noon) ||
+             (time === 'Evening' && medicine.Evening);
+    });
 
-      if (filteredMedicine.length === 0) {
-          return res.sendFile(path.join(__dirname, 'templates', 'no-medicine.html'));
-      }
+    if (filteredMedicine.length === 0) {
+      return res.sendFile(path.join(__dirname, 'templates', 'no-medicine.html'));
+    }
 
-      // Insert data into the database
-      await insertData(filteredMedicine);
+    // Insert data into the database
+    await insertData(filteredMedicine);
 
-      // Redirect to the success page after 5 seconds
-      setTimeout(function() {
-        res.redirect(path.join(__dirname, 'templates', 'success.html'));
-      }, 5000);
-      
+    // Construct the absolute URL for the success page
+    const host = req.headers.host;
+    const successUrl = `https://${host}/.netlify/functions/api/templates/success.html`;
+
+    // Redirect to the success page
+    res.redirect(successUrl);
   } catch (error) {
-      console.error("Error:", error);
-      res.status(500).send("An unexpected error occurred.");
+    console.error("Error:", error);
+    res.status(500).send("An unexpected error occurred.");
   }
 });
 
