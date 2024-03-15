@@ -59,18 +59,30 @@ async function handleAcceptRequest(userId, time, res) {
   }
 }
 
-
 // Route to handle the accept request
 router.get('/:userid/:time/accept', async (req, res) => {
     const userId = req.params.userid;
     const time = req.params.time;
 
-    // Show the loading page while processing
-    const loadingPath = path.join(__dirname, 'templates', 'loading.html');
-    res.sendFile(loadingPath);
+    try {
+        // Fetch medicine data for the specified user ID
+        const medicineData = await getdata(userId);
+        
+        if (!medicineData) {
+            console.log(`No medicine data found for user ID: ${userId}`);
+            return res.status(404).send(`No medicine data found for user ID: ${userId}`);
+        }
 
-    // Call the function to handle the accept request
-    await handleAcceptRequest(userId, time, res);
+        // Show the loading page while processing
+        const loadingPath = path.join(__dirname, 'templates', 'loading.html');
+        res.sendFile(loadingPath);
+
+        // Call the function to handle the accept request
+        await handleAcceptRequest(userId, time, res);
+    } catch (error) {
+        console.error("Error:", error);
+        return res.status(500).send("An unexpected error occurred.");
+    }
 });
 
 // Mount the router
