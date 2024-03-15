@@ -50,4 +50,3 @@ module.export = {
     getMedicine
 };
 // Call the fetchMedicine function with the userid
-getdata("Uc1e97d3b9701a31fba1f9911852eeb8f"); // Replace with the actual userid
