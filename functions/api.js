@@ -4,6 +4,7 @@ const app = express();
 const router = express.Router();
 const { getdata } = require('./findmongodb.js');
 const { insertData } = require('./insertmongodb.js');
+const path = require('path');
 
 router.get('/:userid/:time/accept', async (req, res) => {
   const userId = req.params.userid;
