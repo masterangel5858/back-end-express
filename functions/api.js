@@ -13,6 +13,7 @@ router.get('/:userid/:time/accept', async (req, res) => {
   try {
     // Show the loading page while processing
     res.sendFile(path.join(__dirname, 'templates', 'loading.html'));
+    
 
     // Fetch medicine data for the specified user ID
     const medicineData = await getdata(userId);
@@ -35,9 +36,7 @@ router.get('/:userid/:time/accept', async (req, res) => {
     // Insert data into the database
     await insertData(filteredMedicine);
 
-
-    const successFilePath = path.join(__dirname, 'templates', 'success.html');
-    res.sendFile(successFilePath);
+    res.sendFile(path.join(__dirname, 'templates', 'success.html'));
   } catch (error) {
     console.error("Error:", error);
     res.status(500).send("An unexpected error occurred.");
