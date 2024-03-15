@@ -3,11 +3,12 @@ const serverless = require('serverless-http');
 const app = express();
 const { MongoClient } = require('mongodb');
 const router = express.Router();
-const { getdata } = require('./findmongodb')
+const { getdata } = require('./findmongodb.js')
 //Get all students
 router.get('/', (req, res) => {
   res.send('App is running..');
 });
+
 router.get('/:userid/:time/accept', async (req, res) => {
   const userId = req.params.userid;
   const time = req.params.time;
