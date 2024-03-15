@@ -2,20 +2,14 @@ const express = require('express');
 const serverless = require('serverless-http');
 const app = express();
 const router = express.Router();
-const { insertData } = require('./insertmongodb');
-const {getdata} = require('./findmongodb')
-const path = require('path');
+const { getdata } = require('./findmongodb.js');
+const { insertData } = require('./insertmongodb.js');
 
 router.get('/:userid/:time/accept', async (req, res) => {
   const userId = req.params.userid;
   const time = req.params.time;
 
   try {
-    // Show the loading page while processing
-    res.sendFile(path.join(__dirname, 'templates', 'success.html'));
-    
-    
-
     // Fetch medicine data for the specified user ID
     const medicineData = await getdata(userId);
 
@@ -31,22 +25,38 @@ router.get('/:userid/:time/accept', async (req, res) => {
     });
 
     if (filteredMedicine.length === 0) {
-      return res.sendFile(path.join(__dirname, 'templates', 'no-medicine.html'));
+      return res.send(`No medicine found for ${time}`);
     }
 
-    // Insert data into the database
-    await insertData(filteredMedicine);
+    // Get the current time in the format "hour:minute" in 24-hour format
+    const currentTime = new Date().toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Bangkok' });
 
-    res.sendFile(path.join(__dirname, 'templates', 'loading.html'));
+    // Insert each medicine into the database
+    const insertedMedicines = [];
+    for (const medicine of filteredMedicine) {
+      const newMedicineData = {
+        LineID: userId,
+        MedicName: medicine.MedicName,
+        Morning: medicine.Morning,
+        Noon: medicine.Noon,
+        Evening: medicine.Evening,
+        afbf: medicine.afbf,
+        MedicPicture: medicine.MedicPicture,
+        status: medicine.Status,
+        timestamp: currentTime
+      };
+      await insertData(newMedicineData);
+      insertedMedicines.push(newMedicineData);
+    }
+
+    // Resend the success page
+    const successFilePath = path.join(__dirname, 'templates', 'success.html');
+    return res.sendFile(successFilePath);
   } catch (error) {
     console.error("Error:", error);
     res.status(500).send("An unexpected error occurred.");
   }
 });
 
-
-// Mount the router
 app.use('/.netlify/functions/api', router);
-
-// Export the server
 module.exports.handler = serverless(app);
