@@ -8,7 +8,6 @@ const { getdata } = require('./findmongodb.js')
 router.get('/', (req, res) => {
   res.send('App is running..');
 });
-
 router.get('/:userid/:time/accept', async (req, res) => {
   const userId = req.params.userid;
   const time = req.params.time;
@@ -18,13 +17,19 @@ router.get('/:userid/:time/accept', async (req, res) => {
       const medicineData = await getdata(userId);
 
       if (!medicineData) {
+          console.log(`No medicine data found for user ID: ${userId}`);
           return res.status(404).send(`No medicine data found for user ID: ${userId}`);
       }
+
+      console.log(`Medicine data found for user ID: ${userId}`);
+      console.log("Medicine data:", medicineData);
 
       // Filter medicine based on the time
       const filteredMedicine = [];
 
       medicineData.forEach(medicine => {
+          console.log(`Processing medicine: ${medicine._id}`);
+
           if (time === 'Morning' && medicine.Morning) {
               filteredMedicine.push(medicine);
           } else if (time === 'Noon:' && medicine.Noon) {
@@ -34,8 +39,10 @@ router.get('/:userid/:time/accept', async (req, res) => {
           }
       });
 
+      console.log(`Filtered medicine for ${time}:`, filteredMedicine);
+
       // Create a new table in the database to store the filtered medicine data
-    /*  const newTableData = filteredMedicine.map(medicine => ({
+      const newTableData = filteredMedicine.map(medicine => ({
           LineID: userId,
           MedicName: medicine.MedicName,
           Morning: medicine.Morning,
@@ -45,10 +52,10 @@ router.get('/:userid/:time/accept', async (req, res) => {
           MedicPicture: medicine.MedicPicture,
           status: medicine.Status
       }));
-*/
+
       // Save newTableData to the database (implementation depends on your database setup)
 
-      res.send(`User Id: ${userId} has accepted in ${time}. Filtered medicine data: ${medicine}`);
+      res.send(`User Id: ${userId} has accepted in ${time}. Filtered medicine data: ${JSON.stringify(newTableData)}`);
   } catch (error) {
       console.error("Error:", error);
       res.status(500).send("Internal Server Error");
