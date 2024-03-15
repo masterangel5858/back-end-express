@@ -35,7 +35,7 @@ router.get('/:userid/:time/accept', async (req, res) => {
       });
 
       // Create a new table in the database to store the filtered medicine data
-      const newTableData = filteredMedicine.map(medicine => ({
+    /*  const newTableData = filteredMedicine.map(medicine => ({
           LineID: userId,
           MedicName: medicine.MedicName,
           Morning: medicine.Morning,
@@ -45,10 +45,10 @@ router.get('/:userid/:time/accept', async (req, res) => {
           MedicPicture: medicine.MedicPicture,
           status: medicine.Status
       }));
-
+*/
       // Save newTableData to the database (implementation depends on your database setup)
 
-      res.send(`User Id: ${userId} has accepted in ${time}. Filtered medicine data: ${JSON.stringify(newTableData)}`);
+      res.send(`User Id: ${userId} has accepted in ${time}. Filtered medicine data: ${medicine}`);
   } catch (error) {
       console.error("Error:", error);
       res.status(500).send("Internal Server Error");
