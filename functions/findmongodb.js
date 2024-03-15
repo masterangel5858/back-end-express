@@ -31,16 +31,23 @@ async function getMedicine(userid) {
         await client.close();
     }
 }
-
+/**
+ * find Med data that contain userid
+ * @param {string} userid 
+ */
 // Call the function and handle the result using await or .then()
 async function getdata(userid) {
     try {
         const medicines = await getMedicine(userid); // Wait for the promise to resolve
-        console.log(medicines);
+        return medicines;
     } catch (error) {
         console.error("Error fetching medicine data:", error);
     }
 }
 
+module.export = {
+    getdata,
+    getMedicine
+};
 // Call the fetchMedicine function with the userid
-getdata("U257b95aa167767079d848be1847b9556"); // Replace with the actual userid
+getdata("Uc1e97d3b9701a31fba1f9911852eeb8f"); // Replace with the actual userid
