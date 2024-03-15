@@ -10,7 +10,8 @@ router.get('/:userid/:time/accept', async (req, res) => {
   const time = req.params.time;
 
   try {
-    res.sendFile(path.join(__dirname, 'templates', 'loading.html'));
+    const loadingpath = path.join(__dirname, 'templates', 'loading.html');
+    res.sendFile(loadingpath);
     // Fetch medicine data for the specified user ID
     const medicineData = await getdata(userId);
 
