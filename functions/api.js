@@ -36,6 +36,7 @@ router.get('/:userid/:time/accept', async (req, res) => {
       if (filteredMedicine.length === 0) {
           return res.send(`No medicine found for ${time}`);
       }
+      const currentTime = new Date().toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' });
 
       // Create a new table in the database to store the filtered medicine data
       const newTableData = filteredMedicine.map(medicine => ({
@@ -46,7 +47,8 @@ router.get('/:userid/:time/accept', async (req, res) => {
           Evening: medicine.Evening,
           afbf: medicine.afbf,
           MedicPicture: medicine.MedicPicture,
-          status: medicine.Status
+          status: medicine.Status,
+          timestamp: currentTime
       }));
 
       // Save newTableData to the database (implementation depends on your database setup)
