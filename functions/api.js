@@ -12,7 +12,7 @@ router.get('/:userid/:time/accept', async (req, res) => {
 
   try {
       // Show the loading page while processing
-      res.sendFile('loading.html', { root: __dirname });
+      res.sendFile('/var/task/functions/loading.html');
 
       // Fetch medicine data for the specified user ID
       const medicineData = await getdata(userId);
@@ -29,7 +29,7 @@ router.get('/:userid/:time/accept', async (req, res) => {
       });
 
       if (filteredMedicine.length === 0) {
-          return res.sendFile('no-medicine.html', { root: __dirname });
+          return res.sendFile('/var/task/functions/no-medicine.html');
       }
 
       // Insert data into the database
@@ -37,7 +37,7 @@ router.get('/:userid/:time/accept', async (req, res) => {
 
       // Redirect to the success page after 5 seconds
       setTimeout(function() {
-        res.redirect('/success.html');
+        res.redirect('/var/task/functions//success.html');
       }, 5000);
       
   } catch (error) {
