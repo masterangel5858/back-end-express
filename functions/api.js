@@ -8,6 +8,9 @@ const path = require('path'); // Import the path module
 //html path setting
 const successFilePath = path.join(__dirname, 'templates', 'success.html');
 const nomedicine = path.join(__dirname, 'templates', 'no-medicine.html');
+const loading = path.join(__dirname, 'templates', 'loading.html');
+//time config
+const currentTime = new Date().toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Bangkok' });
 
 router.get('/:userid/:time/accept', async (req, res) => {
   const userId = req.params.userid;
@@ -31,9 +34,6 @@ router.get('/:userid/:time/accept', async (req, res) => {
     if (filteredMedicine.length === 0) {
       return res.send(`No medicine found for ${time}`);
     }
-
-    // Get the current time in the format "hour:minute" in 24-hour format
-    const currentTime = new Date().toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Bangkok' });
 
     // Insert each medicine into the database
     const insertedMedicines = [];
