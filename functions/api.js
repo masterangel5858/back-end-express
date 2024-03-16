@@ -80,7 +80,8 @@ router.get('/:userid/:MedicName/accept', async (req, res) => {
     });
 
     if (!selectedMedicines.length) {
-      return res.send(`No medicine found with the name: ${medicName}`);
+      return res.send(`${medicineData}${selectedMedicines}
+      No medicine found with the name: ${medicName}`);
     }
 
     for (const selectedMedicine of selectedMedicines) {
