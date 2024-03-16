@@ -63,7 +63,6 @@ router.get('/:userid/:time/accept', async (req, res) => {
 });
 
 
-
 router.get('/:userid/:MedicName/accept', async (req, res) => {
   const userId = req.params.userid;
   const medicName = req.params.MedicName;
@@ -75,33 +74,34 @@ router.get('/:userid/:MedicName/accept', async (req, res) => {
     console.log('MedicName', medicName);
 
     if (!medicineData) {
+      console.log(`No medicine data found for user ID: ${userId}`);
       return res.status(404).send(`No medicine data found for user ID: ${userId}`);
     }
 
-    const selectedMedicines = medicineData.Medicine.filter(medicine => {
+    // Find the medicine with the specified name
+    const selectedMedicine = medicineData.Medicine.find(medicine => {
       return medicine.MedicName === medicName;
     });
 
-    if (!selectedMedicines.length) {
-      return res.send(`${medicineData}${selectedMedicines}
-      No medicine found with the name: ${medicName}`);
+    if (!selectedMedicine) {
+      console.log(`No medicine found with the name: ${medicName}`);
+      return res.send(`No medicine found with the name: ${medicName}`);
     }
 
-    for (const selectedMedicine of selectedMedicines) {
-      const newMedicineData = {
-        LineID: userId,
-        MedicName: selectedMedicine.MedicName,
-        Morning: selectedMedicine.Morning,
-        Noon: selectedMedicine.Noon,
-        Evening: selectedMedicine.Evening,
-        afbf: selectedMedicine.afbf,
-        MedicPicture: selectedMedicine.MedicPicture,
-        status: selectedMedicine.Status,
-        timestamp: currentTime
-      };
+    const newMedicineData = {
+      LineID: userId,
+      MedicName: selectedMedicine.MedicName,
+      Morning: selectedMedicine.Morning,
+      Noon: selectedMedicine.Noon,
+      Evening: selectedMedicine.Evening,
+      afbf: selectedMedicine.afbf,
+      MedicPicture: selectedMedicine.MedicPicture,
+      Status: selectedMedicine.Status,
+      timestamp: currentTime
+    };
 
-      await insertData(newMedicineData);
-    }
+    await insertData(newMedicineData);
+    console.log('Inserted medicine:', newMedicineData);
 
     // Send the success page after completing the operation
     const successFilePath = path.join(__dirname, 'templates', 'success.html');
