@@ -4,6 +4,7 @@ const app = express();
 const router = express.Router();
 const { getdata } = require('./findmongodb.js');
 const { insertData } = require('./insertmongodb.js');
+const {getFormattedDate} = require('./setting.js')
 const path = require('path'); // Import the path module
 //html path setting
 const successFilePath = path.join(__dirname, 'templates', 'success.html');
@@ -11,7 +12,7 @@ const nomedicine = path.join(__dirname, 'templates', 'no-medicine.html');
 const loading = path.join(__dirname, 'templates', 'loading.html');
 //time config
 const currentTime = new Date().toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Bangkok' });
-
+const currentDate = getFormattedDate();
 router.get('/acceptall/:userid/:time', async (req, res) => {
   const userId = req.params.userid;
   const time = req.params.time;
@@ -47,6 +48,7 @@ router.get('/acceptall/:userid/:time', async (req, res) => {
         afbf: medicine.afbf,
         MedicPicture: medicine.MedicPicture,
         status: medicine.Status,
+        datestamp: currentDate,
         timestamp: currentTime
       };
       await insertData(newMedicineData);
@@ -94,6 +96,7 @@ router.get('/accept/:userid/:MedicName', async (req, res) => {
       afbf: selectedMedicine.afbf,
       MedicPicture: selectedMedicine.MedicPicture,
       Status: selectedMedicine.Status,
+      datestamp: currentDate,
       timestamp: currentTime
     };
 

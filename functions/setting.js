@@ -1,13 +1,14 @@
-function createNewMedicineData(userId, selectedMedicine, currentTime) {
-    return {
-      LineID: userId,
-      MedicName: selectedMedicine.MedicName,
-      Morning: selectedMedicine.Morning,
-      Noon: selectedMedicine.Noon,
-      Evening: selectedMedicine.Evening,
-      afbf: selectedMedicine.afbf,
-      MedicPicture: selectedMedicine.MedicPicture,
-      status: selectedMedicine.Status,
-      timestamp: currentTime
-    };
+
+function getFormattedDate() {
+    const currentDate = new Date();
+    const year = currentDate.getFullYear();
+    const month = String(currentDate.getMonth() + 1).padStart(2, '0'); // Adding leading zero if needed
+    const date = String(currentDate.getDate()).padStart(2, '0'); // Adding leading zero if needed
+    return `${year}-${month}-${date}`;
   }
+
+
+  
+module.exports={
+  getFormattedDate
+};
