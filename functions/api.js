@@ -61,7 +61,6 @@ router.get('/:userid/:time/accept', async (req, res) => {
     res.status(500).send("An unexpected error occurred.");
   }
 });
-
 router.get('/:userid/:MedicName/accept', async (req, res) => {
   const userId = req.params.userid;
   const medicName = req.params.MedicName;
@@ -69,37 +68,36 @@ router.get('/:userid/:MedicName/accept', async (req, res) => {
   try {
     // Fetch medicine data for the specified user ID
     const medicineData = await getdata(userId);
+    console.log('MedicineData', medicineData);
+    console.log('MedicName', medicName);
 
     if (!medicineData) {
       return res.status(404).send(`No medicine data found for user ID: ${userId}`);
     }
 
-    // Find the medicine with the specified name
-    const selectedMedicine = medicineData.Medicine.find(medicine => {
+    const selectedMedicines = medicineData.Medicine.filter(medicine => {
       return medicine.MedicName === medicName;
     });
 
-    if (!selectedMedicine) {
+    if (!selectedMedicines.length) {
       return res.send(`No medicine found with the name: ${medicName}`);
     }
 
-    // Get the current time in the format "hour:minute" in 24-hour format
-    const currentTime = new Date().toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Bangkok' });
+    for (const selectedMedicine of selectedMedicines) {
+      const newMedicineData = {
+        LineID: userId,
+        MedicName: selectedMedicine.MedicName,
+        Morning: selectedMedicine.Morning,
+        Noon: selectedMedicine.Noon,
+        Evening: selectedMedicine.Evening,
+        afbf: selectedMedicine.afbf,
+        MedicPicture: selectedMedicine.MedicPicture,
+        status: selectedMedicine.Status,
+        timestamp: currentTime
+      };
 
-    // Insert the selected medicine into the database
-    const newMedicineData = {
-      LineID: userId,
-      MedicName: selectedMedicine.MedicName,
-      Morning: selectedMedicine.Morning,
-      Noon: selectedMedicine.Noon,
-      Evening: selectedMedicine.Evening,
-      afbf: selectedMedicine.afbf,
-      MedicPicture: selectedMedicine.MedicPicture,
-      status: selectedMedicine.Status,
-      timestamp: currentTime
-    };
-
-    await insertData(newMedicineData);
+      await insertData(newMedicineData);
+    }
 
     // Send the success page after completing the operation
     const successFilePath = path.join(__dirname, 'templates', 'success.html');
@@ -110,7 +108,6 @@ router.get('/:userid/:MedicName/accept', async (req, res) => {
     res.status(500).send("An unexpected error occurred.");
   }
 });
-
 
 
 
