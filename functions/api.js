@@ -75,34 +75,36 @@ router.get('/:userid/:MedicName/accept', async (req, res) => {
     console.log('MedicName', medicName);
 
     if (!medicineData) {
-      console.log(`No medicine data found for user ID: ${userId}`);
       return res.status(404).send(`No medicine data found for user ID: ${userId}`);
     }
 
-    // Find the medicine with the specified name
-    const selectedMedicine = medicineData.Medicine.find(medicine => {
+    const selectedMedicines = medicineData.Medicine.filter(medicine => {
       return medicine.MedicName === medicName;
     });
 
-    if (!selectedMedicine) {
-      console.log(`No medicine found with the name: ${medicName}`);
-      return res.send(`No medicine found with the name: ${medicName}`);
+    if (!selectedMedicines.length) {
+      return res.send(`${medicineData}${selectedMedicines}
+      No medicine found with the name: ${medicName}`);
     }
-    const newMedicineData = {
-      LineID: userId,
-      MedicName: selectedMedicine.MedicName,
-      Morning: selectedMedicine.Morning,
-      Noon: selectedMedicine.Noon,
-      Evening: selectedMedicine.Evening,
-      afbf: selectedMedicine.afbf,
-      MedicPicture: selectedMedicine.MedicPicture,
-      Status: selectedMedicine.Status,
-      timestamp: currentTime
-    };
 
-    await insertData(newMedicineData);
-    console.log('Inserted medicine:', newMedicineData);
+    for (const selectedMedicine of selectedMedicines) {
+      const newMedicineData = {
+        LineID: userId,
+        MedicName: selectedMedicine.MedicName,
+        Morning: selectedMedicine.Morning,
+        Noon: selectedMedicine.Noon,
+        Evening: selectedMedicine.Evening,
+        afbf: selectedMedicine.afbf,
+        MedicPicture: selectedMedicine.MedicPicture,
+        status: selectedMedicine.Status,
+        timestamp: currentTime
+      };
 
+      await insertData(newMedicineData);
+    }
+
+    // Send the success page after completing the operation
+    const successFilePath = path.join(__dirname, 'templates', 'success.html');
     res.sendFile(successFilePath);
 
   } catch (error) {
