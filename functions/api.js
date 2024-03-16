@@ -2,8 +2,8 @@ const express = require('express');
 const serverless = require('serverless-http');
 const app = express();
 const router = express.Router();
-const { getdata } = require('./findmongodb.js');
-const { insertData } = require('./insertmongodb.js');
+const { getdata } = require('./GetMedicDetail.js');
+const { insertData } = require('./insertMedicineLogs.js');
 const {getFormattedDate} = require('./setting.js')
 const path = require('path'); // Import the path module
 //html path setting
