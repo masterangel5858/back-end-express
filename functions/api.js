@@ -12,7 +12,7 @@ const loading = path.join(__dirname, 'templates', 'loading.html');
 //time config
 const currentTime = new Date().toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Bangkok' });
 
-router.get('/:userid/:time/accept', async (req, res) => {
+router.get('/acceptall/:userid/:time', async (req, res) => {
   const userId = req.params.userid;
   const time = req.params.time;
 
@@ -62,35 +62,45 @@ router.get('/:userid/:time/accept', async (req, res) => {
   }
 });
 
-
-router.get('/:userid/:MedicName/accept', async (req, res) => {
+router.get('/accept/:userid/:MedicName', async (req, res) => {
   const userId = req.params.userid;
   const medicName = req.params.MedicName;
 
   try {
     // Fetch medicine data for the specified user ID
     const medicineData = await getdata(userId);
-    console.log('MedicineData:', medicineData);
-    console.log('MedicName:', medicName);
+    console.log('MedicineData', medicineData);
+    console.log('MedicName', medicName);
 
     if (!medicineData) {
-      console.log(`No medicine data found for user ID: ${userId}`);
       return res.status(404).send(`No medicine data found for user ID: ${userId}`);
     }
 
-    // Check if the medicine with the specified name exists in the database
+    // Find the medicine with the specified name
     const selectedMedicine = medicineData.Medicine.find(medicine => {
       return medicine.MedicName === medicName;
     });
 
     if (!selectedMedicine) {
-      console.log(`No medicine found with the name: ${medicName}`);
       return res.send(`No medicine found with the name: ${medicName}`);
     }
 
-    // If the medicine is found, send a success response
-    console.log(`Medicine found with the name: ${medicName}`);
-    res.send(`Medicine found with the name: ${medicName}`);
+    const newMedicineData = {
+      LineID: userId,
+      MedicName: selectedMedicine.MedicName,
+      Morning: selectedMedicine.Morning,
+      Noon: selectedMedicine.Noon,
+      Evening: selectedMedicine.Evening,
+      afbf: selectedMedicine.afbf,
+      MedicPicture: selectedMedicine.MedicPicture,
+      Status: selectedMedicine.Status,
+      timestamp: currentTime
+    };
+
+    await insertData(newMedicineData);
+
+    // Send the success page after completing the operation
+    res.sendFile(successFilePath);
 
   } catch (error) {
     console.error("Error:", error);
