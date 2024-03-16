@@ -70,15 +70,15 @@ router.get('/:userid/:MedicName/accept', async (req, res) => {
   try {
     // Fetch medicine data for the specified user ID
     const medicineData = await getdata(userId);
-    console.log('MedicineData', medicineData);
-    console.log('MedicName', medicName);
+    console.log('MedicineData:', medicineData);
+    console.log('MedicName:', medicName);
 
     if (!medicineData) {
       console.log(`No medicine data found for user ID: ${userId}`);
       return res.status(404).send(`No medicine data found for user ID: ${userId}`);
     }
 
-    // Find the medicine with the specified name
+    // Check if the medicine with the specified name exists in the database
     const selectedMedicine = medicineData.Medicine.find(medicine => {
       return medicine.MedicName === medicName;
     });
@@ -88,24 +88,9 @@ router.get('/:userid/:MedicName/accept', async (req, res) => {
       return res.send(`No medicine found with the name: ${medicName}`);
     }
 
-    const newMedicineData = {
-      LineID: userId,
-      MedicName: selectedMedicine.MedicName,
-      Morning: selectedMedicine.Morning,
-      Noon: selectedMedicine.Noon,
-      Evening: selectedMedicine.Evening,
-      afbf: selectedMedicine.afbf,
-      MedicPicture: selectedMedicine.MedicPicture,
-      Status: selectedMedicine.Status,
-      timestamp: currentTime
-    };
-
-    await insertData(newMedicineData);
-    console.log('Inserted medicine:', newMedicineData);
-
-    // Send the success page after completing the operation
-    const successFilePath = path.join(__dirname, 'templates', 'success.html');
-    res.sendFile(successFilePath);
+    // If the medicine is found, send a success response
+    console.log(`Medicine found with the name: ${medicName}`);
+    res.send(`Medicine found with the name: ${medicName}`);
 
   } catch (error) {
     console.error("Error:", error);
