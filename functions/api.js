@@ -5,8 +5,9 @@ const router = express.Router();
 const { getdata } = require('./findmongodb.js');
 const { insertData } = require('./insertmongodb.js');
 const path = require('path'); // Import the path module
-
-router 
+//html path setting
+const successFilePath = path.join(__dirname, 'templates', 'success.html');
+const nomedicine = path.join(__dirname, 'templates', 'no-medicine.html');
 
 router.get('/:userid/:time/accept', async (req, res) => {
   const userId = req.params.userid;
@@ -17,7 +18,7 @@ router.get('/:userid/:time/accept', async (req, res) => {
     const medicineData = await getdata(userId);
 
     if (!medicineData) {
-      return res.status(404).send(`No medicine data found for user ID: ${userId}`);
+      return res.status(404).sendFile(nomedicine);
     }
 
     // Filter medicine based on the time
@@ -53,6 +54,54 @@ router.get('/:userid/:time/accept', async (req, res) => {
     }
 
     // Send the success page after completing the operations
+    res.sendFile(successFilePath);
+
+  } catch (error) {
+    console.error("Error:", error);
+    res.status(500).send("An unexpected error occurred.");
+  }
+});
+
+router.get('/:userid/:MedicName/accept', async (req, res) => {
+  const userId = req.params.userid;
+  const medicName = req.params.MedicName;
+
+  try {
+    // Fetch medicine data for the specified user ID
+    const medicineData = await getdata(userId);
+
+    if (!medicineData) {
+      return res.status(404).send(`No medicine data found for user ID: ${userId}`);
+    }
+
+    // Find the medicine with the specified name
+    const selectedMedicine = medicineData.Medicine.find(medicine => {
+      return medicine.MedicName === medicName;
+    });
+
+    if (!selectedMedicine) {
+      return res.send(`No medicine found with the name: ${medicName}`);
+    }
+
+    // Get the current time in the format "hour:minute" in 24-hour format
+    const currentTime = new Date().toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Bangkok' });
+
+    // Insert the selected medicine into the database
+    const newMedicineData = {
+      LineID: userId,
+      MedicName: selectedMedicine.MedicName,
+      Morning: selectedMedicine.Morning,
+      Noon: selectedMedicine.Noon,
+      Evening: selectedMedicine.Evening,
+      afbf: selectedMedicine.afbf,
+      MedicPicture: selectedMedicine.MedicPicture,
+      status: selectedMedicine.Status,
+      timestamp: currentTime
+    };
+
+    await insertData(newMedicineData);
+
+    // Send the success page after completing the operation
     const successFilePath = path.join(__dirname, 'templates', 'success.html');
     res.sendFile(successFilePath);
 
@@ -61,6 +110,11 @@ router.get('/:userid/:time/accept', async (req, res) => {
     res.status(500).send("An unexpected error occurred.");
   }
 });
+
+
+
+
+
 
 router.get('/getdatamed/:userid', async (req, res) => {
   const userId = req.params.userid;
