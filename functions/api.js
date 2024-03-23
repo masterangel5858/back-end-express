@@ -24,7 +24,7 @@ router.get('/getdatauser/:userid', async (req, res) => {
     // Check if userData is empty or null
     if (!userData || Object.keys(userData).length === 0) {
       console.log(`No user data found for user ID: ${userId}`);
-      return res.status(404).send(`No user data found for user ID: ${userId}`);
+      return res.send(`No user data found for user ID: ${userId}`);
     }
 
     // User data found, return it
