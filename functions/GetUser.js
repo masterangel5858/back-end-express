@@ -39,5 +39,6 @@ async function fetchuserdata(LineID) {
 
 
     module.exports = {
-        fetchuserdata
+        fetchuserdata,
+        getuserdata
     };
