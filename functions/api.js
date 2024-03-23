@@ -2,7 +2,7 @@ const express = require('express');
 const serverless = require('serverless-http');
 const app = express();
 const router = express.Router();
-const { getdata } = require('./GetMedicDetail.js');
+const { getdata, updateStockall,updateMedData, updateStockMed } = require('./GetMedicDetail.js');
 const { insertData } = require('./insertMedicineLogs.js');
 const {getFormattedDate} = require('./setting.js')
 const {fetchuserdata} = require('./GetUser.js')
@@ -28,7 +28,7 @@ router.get('/getdatauser/:userid', async (req, res) => {
       console.log(`No user data found for user ID: ${userId}`);
       return res.send(`No user data found for user ID: ${userId}`);
     }
-
+    
     // User data found, return it
     return res.json(userData);
   } catch (error) {
@@ -81,7 +81,7 @@ router.get('/acceptall/:userid/:time', async (req, res) => {
     if (filteredMedicine.length === 0) {
       return res.send(`No medicine found for ${time}`);
     }
-
+    updateStockall(userId,time);
     // Insert each medicine into the database
     const insertedMedicines = [];
     for (const medicine of filteredMedicine) {
@@ -92,6 +92,7 @@ router.get('/acceptall/:userid/:time', async (req, res) => {
         Noon: medicine.Noon,
         Evening: medicine.Evening,
         afbf: medicine.afbf,
+        stock: selectedMedicine.stock,
         MedicPicture: medicine.MedicPicture,
         status: medicine.Status,
         datestamp: currentDate,
@@ -132,7 +133,7 @@ router.get('/accept/:userid/:MedicName', async (req, res) => {
     if (!selectedMedicine) {
       return res.send(`No medicine found with the name: ${medicName}`);
     }
-
+    updateStockMed(LineID,medicName);
     const newMedicineData = {
       LineID: userId,
       MedicName: selectedMedicine.MedicName,
@@ -140,6 +141,7 @@ router.get('/accept/:userid/:MedicName', async (req, res) => {
       Noon: selectedMedicine.Noon,
       Evening: selectedMedicine.Evening,
       afbf: selectedMedicine.afbf,
+      stock: selectedMedicine.stock,
       MedicPicture: selectedMedicine.MedicPicture,
       Status: selectedMedicine.Status,
       datestamp: currentDate,
