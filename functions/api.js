@@ -133,7 +133,7 @@ router.get('/accept/:userid/:MedicName', async (req, res) => {
     if (!selectedMedicine) {
       return res.send(`No medicine found with the name: ${medicName}`);
     }
-    updateStockMed(LineID,medicName);
+    updateStockMed(userid,medicName);
     const newMedicineData = {
       LineID: userId,
       MedicName: selectedMedicine.MedicName,
