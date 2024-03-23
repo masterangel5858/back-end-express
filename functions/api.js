@@ -10,7 +10,6 @@ const {updateNotifyTime} = require('./GetNotifytime.js')
 const path = require('path'); // Import the path module
 //html path setting
 const successFilePath = path.join(__dirname, 'templates', 'success.html');
-const snoozeFilePath = path.join(__dirname, 'templates', 'Snooze.html');
 const nomedicine = path.join(__dirname, 'templates', 'no-medicine.html');
 const loading = path.join(__dirname, 'templates', 'loading.html');
 //time config
@@ -48,7 +47,7 @@ router.get('/snoozeall/:userid/:time', async (req, res) => {
     await updateNotifyTime(userId, time);
 
     // Redirect the user to the HTML page
-    res.sendFile(snoozeFilePath); // Change the path to your actual HTML page
+    res.redirect('/Snooze.html'); // Change the path to your actual HTML page
   } catch (error) {
     // Handle errors
     console.error('Error snoozing all notifications:', error);
