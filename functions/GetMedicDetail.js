@@ -93,7 +93,7 @@ async function updateStockall(LineID, time) {
     }
 }
 
-async function updateMedicineStock(LineID, MedicName) {
+async function updateStockMed(LineID, MedicName) {
     try {
         const medicine = await getMedicine(LineID);
 
