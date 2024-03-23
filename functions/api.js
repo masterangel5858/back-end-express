@@ -137,7 +137,6 @@ router.get('/getdatamed/:userid', async (req, res) => {
       return res.status(500).send("An unexpected error occurred.");
   }
 });
-
 router.get('/getdatamed/:userid/:time', async (req, res) => {
   const userId = req.params.userid;
   const time = req.params.time;
@@ -162,8 +161,15 @@ router.get('/getdatamed/:userid/:time', async (req, res) => {
       return res.send(`No medicine found for ${time}`);
     }
 
-    // Send the filtered medicine data as a response
-    return res.json(filteredMedicine);
+    // Create a response object with the original format
+    const response = {
+      _id: medicineData._id,
+      LineID: medicineData.LineID,
+      Medicine: filteredMedicine
+    };
+
+    // Send the response
+    return res.json(response);
   } catch (error) {
     console.error("Error:", error);
     return res.status(500).send("An unexpected error occurred.");
