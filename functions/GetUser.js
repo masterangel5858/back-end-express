@@ -31,7 +31,6 @@ async function fetchuserdata(LineID) {
         return [];
       }
   
-      console.log("All Documents:\n", documents);
     } catch (innerError) {
         console.error("Error processing document:", innerError);
       }
