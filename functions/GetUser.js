@@ -22,20 +22,19 @@ async function getuserdata(LineID) {
   }
 }
 
-
 async function fetchuserdata(LineID) {
-    try {
+  try {
       const documents = await getuserdata(LineID);
       if (!documents) {
-        console.error("No documents found");
-        return [];
+          throw new Error("No documents found");
       }
-  
-    } catch (innerError) {
-        console.error("Error processing document:", innerError);
-      }
-    };
-
+      return documents;
+  } catch (innerError) {
+      console.error("Error processing document:", innerError);
+      // Re-throw the error to propagate it to the caller
+      throw innerError;
+  }
+}
 
     module.exports = {
         fetchuserdata,
