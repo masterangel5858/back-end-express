@@ -15,17 +15,23 @@ const loading = path.join(__dirname, 'templates', 'loading.html');
 const currentTime = new Date().toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Bangkok' });
 const currentDate = getFormattedDate();
 
-
 router.get('/getdatauser/:userid', async (req, res) => {
   const userId = req.params.userid;
 
   try {
-      const userData = await fetchuserdata(userId);
-      console.log(userData)
-      return res.json(userData);
+    const userData = await fetchuserdata(userId);
+    
+    // Check if userData is empty or null
+    if (!userData || Object.keys(userData).length === 0) {
+      console.log(`No user data found for user ID: ${userId}`);
+      return res.status(404).send(`No user data found for user ID: ${userId}`);
+    }
+
+    // User data found, return it
+    return res.json(userData);
   } catch (error) {
-      console.error("Error:", error);
-      return res.status(500).send("An unexpected error occurred.");
+    console.error("Error:", error);
+    return res.status(500).send("An unexpected error occurred.");
   }
 });
 
