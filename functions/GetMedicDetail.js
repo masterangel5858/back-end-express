@@ -3,33 +3,24 @@ const { MongoClient } = require("mongodb");
 const url = "mongodb+srv://admin:1234@healthcaredemo.nlwfzbm.mongodb.net/?retryWrites=true&w=majority";
 const client = new MongoClient(url);
 const dbName = "HealthCare";
-
 async function getMedicine(userId) {
     try {
-        await client.connect();
-        const db = client.db(dbName);
-        const col = db.collection("MedicDetail");
+        await client.connect(); // Connect to the MongoDB server
+        const db = client.db(dbName); // Get the database instance
+        const col = db.collection("MedicDetail"); // Get the collection instance
 
         // Fetch documents for the given userId
         const document = await col.findOne({ LineID: userId });
 
         // Return the Medicine array if document exists
-        if (document && Array.isArray(document.Medicine)) {
-            return {
-                _id: document._id,
-                LineID: document.LineID,
-                Medicine: document.Medicine
-            };
-        } else {
-            return null; // Return null if no matching document or Medicine array
-        }
+        return document && Array.isArray(document.Medicine) ? {
+            _id: document._id,
+            LineID: document.LineID,
+            Medicine: document.Medicine
+        } : null;
 
-    } catch (error) {
-        console.error("Error:", error);
-        throw error; // Re-throw the error to handle it outside the function
     } finally {
-        // Close the connection
-        await client.close();
+        await client.close(); // Close the connection
     }
 }
 
@@ -47,15 +38,16 @@ async function getdata(userId) {
         throw error; // Re-throw the error to handle it outside the function
     }
 }
+
 async function updateMedData(LineID, updatedMedicines) {
     try {
-        await client.connect();
-        const db = client.db(dbName);
-        const col = db.collection("MedicDetail");
+        await client.connect(); // Connect to the MongoDB server
+        const db = client.db(dbName); // Get the database instance
+        const col = db.collection("MedicDetail"); // Get the collection instance
 
         // Loop through each updated medicine
         for (const updatedMedicine of updatedMedicines) {
-            const filter = { LineID: LineID, 'Medicine.MedicName': updatedMedicine.MedicName };
+            const filter = { LineID, 'Medicine.MedicName': updatedMedicine.MedicName };
             const updateOperation = { $set: { 'Medicine.$.stock': updatedMedicine.stock } };
 
             // Update the stock value of the medicine
@@ -63,14 +55,11 @@ async function updateMedData(LineID, updatedMedicines) {
         }
 
         console.log('Medicine data updated successfully.');
-    } catch (error) {
-        console.error("Error updating medicine data:", error);
-        throw error; // Re-throw the error to handle it outside the function
     } finally {
-        // Close the connection
-        await client.close();
+        await client.close(); // Close the connection
     }
 }
+
 async function updateStockall(LineID, time) {
     try {
         const medicines = await getdata(LineID);
@@ -85,7 +74,7 @@ async function updateStockall(LineID, time) {
 
         // Update the stock of matching medicines concurrently
         await Promise.all(matchingMedicines.map(async (medicine) => {
-            return updateMedicineStock(LineID, medicine.MedicName);
+            return updateStockMed(LineID, medicine.MedicName);
         }));
     } catch (error) {
         console.error('Error updating stock:', error);
