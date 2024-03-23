@@ -21,6 +21,7 @@ router.get('/getdatauser/:userid', async (req, res) => {
 
   try {
       const userData = await fetchuserdata(userId);
+      console.log(userData)
       return res.json(userData);
   } catch (error) {
       console.error("Error:", error);
