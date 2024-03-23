@@ -71,7 +71,6 @@ async function updateMedData(LineID, updatedMedicines) {
         await client.close();
     }
 }
-
 async function updateStockall(LineID, time) {
     try {
         const medicines = await getdata(LineID);
@@ -81,23 +80,20 @@ async function updateStockall(LineID, time) {
             throw new Error('No medicine data found');
         }
 
-        // Update the stock value for all medicines that match the specified time
-        const updatedMedicines = medicines.Medicine.map(medicine => {
-            if (medicine[time]) {
-                return { ...medicine, stock: medicine.stock - 1 };
-            }
-            return medicine; // Return unchanged medicine if time doesn't match
-        });
+        // Filter medicines that match the specified time
+        const matchingMedicines = medicines.Medicine.filter(medicine => medicine[time]);
 
-        // Update the medicine data in the database
-        await updateMedData(LineID, updatedMedicines);
+        // Update the stock of matching medicines concurrently
+        await Promise.all(matchingMedicines.map(async (medicine) => {
+            return updateMedicineStock(LineID, medicine.MedicName);
+        }));
     } catch (error) {
         console.error('Error updating stock:', error);
-        throw error; // Re-throw the error to handle it outside the function
+        throw error;
     }
 }
 
-async function updateStockMed(LineID, MedicName) {
+async function updateMedicineStock(LineID, MedicName) {
     try {
         const medicine = await getMedicine(LineID);
 
@@ -121,10 +117,9 @@ async function updateStockMed(LineID, MedicName) {
         }
     } catch (error) {
         console.error('Error updating stock:', error);
-        throw error; // Re-throw the error to handle it outside the function
+        throw error;
     }
 }
-
 
 module.exports = {
     getdata,
