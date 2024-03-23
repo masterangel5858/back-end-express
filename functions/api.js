@@ -56,7 +56,7 @@ router.get('/snoozeall/:userid/:time', async (req, res) => {
 });
 
 
-
+//test
 
 router.get('/acceptall/:userid/:time', async (req, res) => {
   const userId = req.params.userid;
