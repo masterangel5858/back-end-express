@@ -16,6 +16,25 @@ const currentTime = new Date().toLocaleTimeString('en-US', { hour12: false, hour
 const currentDate = getFormattedDate();
 
 
+router.get('/getdatauser/:userid', async (req, res) => {
+  const userId = req.params.userid;
+
+  try {
+      const userData = await fetchuserdata(userId);
+      
+      if (!userData) {
+          console.log(`No user data found for user ID: ${userId}`);
+          return res.status(404).send(`No user data found for user ID: ${userId}`);
+      }
+
+      return res.json(userData);
+  } catch (error) {
+      console.error("Error:", error);
+      return res.status(500).send("An unexpected error occurred.");
+  }
+});
+
+
 router.get('/acceptall/:userid/:time', async (req, res) => {
   const userId = req.params.userid;
   const time = req.params.time;
@@ -176,23 +195,6 @@ router.get('/getdatamed/:userid/:time', async (req, res) => {
   }
 });
 
-router.get('/getdatauser/:userid', async (req, res) => {
-  const userId = req.params.userid;
-
-  try {
-      const userData = await fetchuserdata(userId);
-      
-      if (!userData) {
-          console.log(`No user data found for user ID: ${userId}`);
-          return res.status(404).send(`No user data found for user ID: ${userId}`);
-      }
-
-      return res.json(userData);
-  } catch (error) {
-      console.error("Error:", error);
-      return res.status(500).send("An unexpected error occurred.");
-  }
-});
 
 
 

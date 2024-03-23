@@ -13,8 +13,6 @@ async function getuserdata(LineID) {
     const col = db.collection("User");
 
     const document = await col.findOne({ LineID: LineID });
-
-
     return document;
   } catch (err) {
     console.log(err.stack);
