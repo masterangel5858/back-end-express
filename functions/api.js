@@ -6,6 +6,7 @@ const { getdata } = require('./GetMedicDetail.js');
 const { insertData } = require('./insertMedicineLogs.js');
 const {getFormattedDate} = require('./setting.js')
 const {fetchuserdata} = require('./GetUser.js')
+const {updateNotifyTime} = require('./GetNotifytime.js')
 const path = require('path'); // Import the path module
 //html path setting
 const successFilePath = path.join(__dirname, 'templates', 'success.html');
@@ -31,9 +32,30 @@ router.get('/getdatauser/:userid', async (req, res) => {
     return res.json(userData);
   } catch (error) {
     console.error("Error:", error);
-    return res.status(500).send("An unexpected error occurred.");
+    return res.status(500).send("An unexpected error occurred while fetching user data.");
   }
 });
+
+
+
+router.get('/snoozeall/:userid/:time', async (req, res) => {
+  const userId = req.params.userid;
+  const time = req.params.time;
+
+  try {
+    // Call the updateNotifyTime function to update the notification time
+    await updateNotifyTime(userId, time);
+
+    // Redirect the user to the HTML page
+    res.redirect('/Snooze.html'); // Change the path to your actual HTML page
+  } catch (error) {
+    // Handle errors
+    console.error('Error snoozing all notifications:', error);
+    res.status(500).send('An error occurred while snoozing all notifications.');
+  }
+});
+
+
 
 
 router.get('/acceptall/:userid/:time', async (req, res) => {
