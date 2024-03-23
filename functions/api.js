@@ -138,6 +138,38 @@ router.get('/getdatamed/:userid', async (req, res) => {
   }
 });
 
+router.get('/getdatamed/:userid/:time', async (req, res) => {
+  const userId = req.params.userid;
+  const time = req.params.time;
+
+  try {
+    // Fetch all medicine data for the specified user ID
+    const medicineData = await getdata(userId);
+    
+    if (!medicineData) {
+      console.log(`No medicine data found for user ID: ${userId}`);
+      return res.status(404).send(`No medicine data found for user ID: ${userId}`);
+    }
+
+    // Filter medicine based on the time
+    const filteredMedicine = medicineData.Medicine.filter(medicine => {
+      return (time === 'Morning' && medicine.Morning) ||
+             (time === 'Noon' && medicine.Noon) ||
+             (time === 'Evening' && medicine.Evening);
+    });
+
+    if (filteredMedicine.length === 0) {
+      return res.send(`No medicine found for ${time}`);
+    }
+
+    // Send the filtered medicine data as a response
+    return res.json(filteredMedicine);
+  } catch (error) {
+    console.error("Error:", error);
+    return res.status(500).send("An unexpected error occurred.");
+  }
+});
+
 router.get('/getdatauser/:userid', async (req, res) => {
   const userId = req.params.userid;
 
