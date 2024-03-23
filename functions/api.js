@@ -5,6 +5,7 @@ const router = express.Router();
 const { getdata } = require('./GetMedicDetail.js');
 const { insertData } = require('./insertMedicineLogs.js');
 const {getFormattedDate} = require('./setting.js')
+const {fetchuserdata} = require('./GetUser.js')
 const path = require('path'); // Import the path module
 //html path setting
 const successFilePath = path.join(__dirname, 'templates', 'success.html');
@@ -13,6 +14,8 @@ const loading = path.join(__dirname, 'templates', 'loading.html');
 //time config
 const currentTime = new Date().toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Bangkok' });
 const currentDate = getFormattedDate();
+
+
 router.get('/acceptall/:userid/:time', async (req, res) => {
   const userId = req.params.userid;
   const time = req.params.time;
@@ -134,6 +137,27 @@ router.get('/getdatamed/:userid', async (req, res) => {
       return res.status(500).send("An unexpected error occurred.");
   }
 });
+
+router.get('/getdatauser/:userid', async (req, res) => {
+  const userId = req.params.userid;
+
+  try {
+      const userData = await fetchuserdata(userId);
+      
+      if (!userData) {
+          console.log(`No user data found for user ID: ${userId}`);
+          return res.status(404).send(`No user data found for user ID: ${userId}`);
+      }
+
+      return res.json(userData);
+  } catch (error) {
+      console.error("Error:", error);
+      return res.status(500).send("An unexpected error occurred.");
+  }
+});
+
+
+
 
 app.use('/.netlify/functions/api', router);
 module.exports.handler = serverless(app);
