@@ -117,17 +117,9 @@ async function updateStockMed(LineID, MedicName) {
 
 module.exports = {
     getdata,
-<<<<<<< HEAD
     getMedicine
 };
 
 
 getdata('U33cd6913cb1d26a21f1f83b1a3bd7638'); // Replace 'userId' with the actual user ID
 
-=======
-    getMedicine,
-    updateStockall,
-    updateMedData,
-    updateStockMed
-};
->>>>>>> parent of 468cc70 (unsed update stock)
