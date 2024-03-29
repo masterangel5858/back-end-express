@@ -14,7 +14,7 @@ const { connectToDatabase, DisconnectToDatabase ,client} = require('./connectedd
 const successFilePath = path.join(__dirname, 'templates', 'success.html');
 const nomedicine = path.join(__dirname, 'templates', 'no-medicine.html');
 const loading = path.join(__dirname, 'templates', 'loading.html');
-const Snooze = path.join(__dirname, 'templates', 'Snooze.html');
+const Snooze = path.join(__dirname, 'templates', 'loading.html');
 //time config
 const currentTime = new Date().toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Bangkok' });
 const currentDate = getFormattedDate();
@@ -128,8 +128,7 @@ router.get('/snoozeall/:userid/:time', async (req, res) => {
     await updateNotifyTime(userId, time);
 
     // Redirect the user to the HTML page
-    res.json("snoozeall")
-    // res.sendFile(successFilePath);
+    res.sendFile(successFilePath);
   } catch (error) {
     // Handle errors
     console.error('Error snoozing all notifications:', error);
@@ -182,13 +181,12 @@ router.get('/acceptall/:userid/:time', async (req, res) => {
         datestamp: currentDate,
         timestamp: currentTime
       };
-      await insertData(newMedicineData);
       insertedMedicines.push(newMedicineData);
+      insertData(newMedicineData);
     }
 
     // Send the success page after completing the operations
-    // res.sendFile(successFilePath);
-    res.json("acceptall completed")
+    res.sendFile(successFilePath);
 
   } catch (error) {
     console.error("Error:", error);
@@ -241,10 +239,8 @@ router.get('/accept/:userid/:MedicName', async (req, res) => {
     await insertData(newMedicineData);
 
     // Send the success page after completing the operation
-    // res.sendFile(successFilePath);
+    res.sendFile(successFilePath);
 
-
-    res.json("Accept Medicine")
   } catch (error) {
     console.error("Error:", error);
     res.status(500).send("An unexpected error occurred.");
@@ -252,7 +248,6 @@ router.get('/accept/:userid/:MedicName', async (req, res) => {
     await DisconnectToDatabase();
   }
 });
-
 
 
 
