@@ -1,12 +1,8 @@
-const { MongoClient } = require("mongodb");
-
-const url = "mongodb+srv://admin:1234@healthcaredemo.nlwfzbm.mongodb.net/?retryWrites=true&w=majority";
-const client = new MongoClient(url);
-const dbName = "HealthCare";
+const {connectToDatabase} = require('./connecteddatabase')
 
 async function getMedicine(userId) {
     try {
-        await client.connect();
+        await connectToDatabase();
         const db = client.db(dbName);
         const col = db.collection("MedicDetail");
 
@@ -27,9 +23,6 @@ async function getMedicine(userId) {
     } catch (error) {
         console.error("Error:", error);
         throw error; // Re-throw the error to handle it outside the function
-    } finally {
-        // Close the connection
-        await client.close();
     }
 }
 

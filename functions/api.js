@@ -8,6 +8,7 @@ const {getFormattedDate} = require('./setting.js')
 const {fetchuserdata} = require('./GetUser.js')
 const {updateNotifyTime} = require('./GetNotifytime.js')
 const path = require('path'); // Import the path module
+const { connectToDatabase, DisconnectToDatabase } = require('./connecteddatabase.js');
 //html path setting
 const successFilePath = path.join(__dirname, 'templates', 'success.html');
 const snoozeFilePath = path.join(__dirname, 'templates', 'Snooze.html');
@@ -17,6 +18,9 @@ const loading = path.join(__dirname, 'templates', 'loading.html');
 const currentTime = new Date().toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Bangkok' });
 const currentDate = getFormattedDate();
 
+
+//***Route
+//getdatauser/userid
 router.get('/getdatauser/:userid', async (req, res) => {
   const userId = req.params.userid;
 
@@ -38,7 +42,78 @@ router.get('/getdatauser/:userid', async (req, res) => {
 });
 
 
+//***Route
+//getdatamed/userid
+router.get('/getdatamed/:userid', async (req, res) => {
+  const userId = req.params.userid;
 
+  try {
+      await connectToDatabase();
+      // Fetch all medicine data for the specified user ID
+      const medicineData = await getdata(userId);
+      
+      if (!medicineData) {
+          console.log(`No medicine data found for user ID: ${userId}`);
+          return res.status(404).send(`No medicine data found for user ID: ${userId}`);
+      }
+
+      // Send the fetched medicine data as a response
+      return res.json(medicineData);
+  } catch (error) {
+      console.error("Error:", error);
+      await DisconnectToDatabase();
+      return res.status(500).send("An unexpected error occurred.",error);
+  } finally {
+    await DisconnectToDatabase();
+  }
+  
+});
+
+
+//***Route
+//getdatamed/userid/time
+router.get('/getdatamed/:userid/:time', async (req, res) => {
+  const userId = req.params.userid;
+  const time = req.params.time;
+
+  try {
+    // Fetch all medicine data for the specified user ID
+    const medicineData = await getdata(userId);
+    
+    if (!medicineData) {
+      console.log(`No medicine data found for user ID: ${userId}`);
+      return res.status(404).send(`No medicine data found for user ID: ${userId}`);
+    }
+
+    // Filter medicine based on the time
+    const filteredMedicine = medicineData.Medicine.filter(medicine => {
+      return (time === 'Morning' && medicine.Morning) ||
+             (time === 'Noon' && medicine.Noon) ||
+             (time === 'Evening' && medicine.Evening);
+    });
+
+    if (filteredMedicine.length === 0) {
+      return res.send(`No medicine found for ${time}`);
+    }
+
+    // Create a response object with the original format
+    const response = {
+      _id: medicineData._id,
+      LineID: medicineData.LineID,
+      Medicine: filteredMedicine
+    };
+
+    // Send the response
+    return res.json(response);
+  } catch (error) {
+    console.error("Error:", error);
+    return res.status(500).send("An unexpected error occurred.");
+  }
+});
+
+
+//Snoozeall
+//snoozeall/userid/time
 router.get('/snoozeall/:userid/:time', async (req, res) => {
   const userId = req.params.userid;
   const time = req.params.time;
@@ -57,8 +132,8 @@ router.get('/snoozeall/:userid/:time', async (req, res) => {
 });
 
 
-//test
-
+//AcceptAll
+//acceptall/:userid/:time
 router.get('/acceptall/:userid/:time', async (req, res) => {
   const userId = req.params.userid;
   const time = req.params.time;
@@ -110,6 +185,8 @@ router.get('/acceptall/:userid/:time', async (req, res) => {
   }
 });
 
+//Accept
+//accept/userid/Medicname
 router.get('/accept/:userid/:MedicName', async (req, res) => {
   const userId = req.params.userid;
   const medicName = req.params.MedicName;
@@ -157,67 +234,6 @@ router.get('/accept/:userid/:MedicName', async (req, res) => {
   }
 });
 
-
-
-
-
-router.get('/getdatamed/:userid', async (req, res) => {
-  const userId = req.params.userid;
-
-  try {
-      // Fetch all medicine data for the specified user ID
-      const medicineData = await getdata(userId);
-      
-      if (!medicineData) {
-          console.log(`No medicine data found for user ID: ${userId}`);
-          return res.status(404).send(`No medicine data found for user ID: ${userId}`);
-      }
-
-      // Send the fetched medicine data as a response
-      return res.json(medicineData);
-  } catch (error) {
-      console.error("Error:", error);
-      return res.status(500).send("An unexpected error occurred.");
-  }
-});
-router.get('/getdatamed/:userid/:time', async (req, res) => {
-  const userId = req.params.userid;
-  const time = req.params.time;
-
-  try {
-    // Fetch all medicine data for the specified user ID
-    const medicineData = await getdata(userId);
-    
-    if (!medicineData) {
-      console.log(`No medicine data found for user ID: ${userId}`);
-      return res.status(404).send(`No medicine data found for user ID: ${userId}`);
-    }
-
-    // Filter medicine based on the time
-    const filteredMedicine = medicineData.Medicine.filter(medicine => {
-      return (time === 'Morning' && medicine.Morning) ||
-             (time === 'Noon' && medicine.Noon) ||
-             (time === 'Evening' && medicine.Evening);
-    });
-
-    if (filteredMedicine.length === 0) {
-      return res.send(`No medicine found for ${time}`);
-    }
-
-    // Create a response object with the original format
-    const response = {
-      _id: medicineData._id,
-      LineID: medicineData.LineID,
-      Medicine: filteredMedicine
-    };
-
-    // Send the response
-    return res.json(response);
-  } catch (error) {
-    console.error("Error:", error);
-    return res.status(500).send("An unexpected error occurred.");
-  }
-});
 
 
 
