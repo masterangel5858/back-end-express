@@ -120,6 +120,3 @@ module.exports = {
     getMedicine
 };
 
-
-getdata('U33cd6913cb1d26a21f1f83b1a3bd7638'); // Replace 'userId' with the actual user ID
-
