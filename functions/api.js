@@ -182,7 +182,7 @@ router.get('/acceptall/:userid/:time', async (req, res) => {
         timestamp: currentTime
       };
       insertedMedicines.push(newMedicineData);
-      insertData(newMedicineData);
+      // insertData(newMedicineData);
     }
 
     // Send the success page after completing the operations
@@ -235,7 +235,7 @@ router.get('/accept/:userid/:MedicName', async (req, res) => {
       datestamp: currentDate,
       timestamp: currentTime
     };
-    insertData(newMedicineData);
+    // insertData(newMedicineData);
 
     // Send the success page after completing the operation
     res.sendFile(successFilePath);
