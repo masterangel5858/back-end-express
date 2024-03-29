@@ -1,4 +1,5 @@
-const {connectToDatabase} = require('./connecteddatabase')
+const {connectToDatabase,client,dbName} = require('./connecteddatabase')
+const { MongoClient } = require("mongodb");
 
 async function getMedicine(userId) {
     try {
@@ -46,6 +47,6 @@ module.exports = {
     getMedicine
 };
 
-// Don't forget to call the function if needed
-// getdata('userId'); // Replace 'userId' with the actual user ID
+
+getdata('U33cd6913cb1d26a21f1f83b1a3bd7638'); // Replace 'userId' with the actual user ID
 

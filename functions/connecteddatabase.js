@@ -37,5 +37,7 @@ async function DisconnectToDatabase() {
 
 module.exports = {
     connectToDatabase,
-    DisconnectToDatabase
+    DisconnectToDatabase,
+    client,
+    dbName
 };

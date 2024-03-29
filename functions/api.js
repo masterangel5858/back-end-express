@@ -8,7 +8,7 @@ const {getFormattedDate} = require('./setting.js')
 const {fetchuserdata} = require('./GetUser.js')
 const {updateNotifyTime} = require('./GetNotifytime.js')
 const path = require('path'); // Import the path module
-const { connectToDatabase, DisconnectToDatabase } = require('./connecteddatabase.js');
+const { connectToDatabase, DisconnectToDatabase ,client} = require('./connecteddatabase.js');
 //html path setting
 const successFilePath = path.join(__dirname, 'templates', 'success.html');
 const snoozeFilePath = path.join(__dirname, 'templates', 'Snooze.html');
