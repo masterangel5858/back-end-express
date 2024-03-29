@@ -164,7 +164,7 @@ router.get('/acceptall/:userid/:time', async (req, res) => {
     if (filteredMedicine.length === 0) {
       return res.send(`No medicine found for ${time}`);
     }
-    // await updateStockall(userId,time);
+    await updateStockall(userId,time);
     // Insert each medicine into the database
     const insertedMedicines = [];
     for (const medicine of filteredMedicine) {
@@ -221,7 +221,7 @@ router.get('/accept/:userid/:MedicName', async (req, res) => {
     if (!selectedMedicine) {
       return res.send(`No medicine found with the name: ${medicName}`);
     }
-    // await updateStockMed(userId,medicName);
+    await updateStockMed(userId,medicName);
     const newMedicineData = {
       LineID: userId,
       MedicName: selectedMedicine.MedicName,
