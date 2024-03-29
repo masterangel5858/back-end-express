@@ -128,7 +128,8 @@ router.get('/snoozeall/:userid/:time', async (req, res) => {
     await updateNotifyTime(userId, time);
 
     // Redirect the user to the HTML page
-    res.sendFile(successFilePath);
+    res.json("snoozeall")
+    // res.sendFile(successFilePath);
   } catch (error) {
     // Handle errors
     console.error('Error snoozing all notifications:', error);
@@ -186,7 +187,8 @@ router.get('/acceptall/:userid/:time', async (req, res) => {
     }
 
     // Send the success page after completing the operations
-    res.sendFile(successFilePath);
+    // res.sendFile(successFilePath);
+    res.json("acceptall completed")
 
   } catch (error) {
     console.error("Error:", error);
@@ -239,8 +241,10 @@ router.get('/accept/:userid/:MedicName', async (req, res) => {
     await insertData(newMedicineData);
 
     // Send the success page after completing the operation
-    res.sendFile(successFilePath);
+    // res.sendFile(successFilePath);
 
+
+    res.json("Accept Medicine")
   } catch (error) {
     console.error("Error:", error);
     res.status(500).send("An unexpected error occurred.");
@@ -248,6 +252,7 @@ router.get('/accept/:userid/:MedicName', async (req, res) => {
     await DisconnectToDatabase();
   }
 });
+
 
 
 
