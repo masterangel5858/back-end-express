@@ -14,6 +14,7 @@ const { connectToDatabase, DisconnectToDatabase ,client} = require('./connectedd
 const successFilePath = path.join(__dirname, 'templates', 'success.html');
 const nomedicine = path.join(__dirname, 'templates', 'no-medicine.html');
 const loading = path.join(__dirname, 'templates', 'loading.html');
+const Snooze = path.join(__dirname, 'templates', 'Snooze.html');
 //time config
 const currentTime = new Date().toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Bangkok' });
 const currentDate = getFormattedDate();
@@ -127,7 +128,7 @@ router.get('/snoozeall/:userid/:time', async (req, res) => {
     await updateNotifyTime(userId, time);
 
     // Redirect the user to the HTML page
-    res.redirect('/Snooze.html'); // Change the path to your actual HTML page
+    res.sendFile(successFilePath);
   } catch (error) {
     // Handle errors
     console.error('Error snoozing all notifications:', error);
