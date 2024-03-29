@@ -24,9 +24,10 @@ async function connectToDatabase() {
 
 async function DisconnectToDatabase() {
     try {
-        if (!isConnected){
+        if (isConnected){
             await client.close();
-            
+            console.log("Disconnected Database")
+            isConnected = false;
         }
     } catch(err){
         console.log('error to disconected to database',err);

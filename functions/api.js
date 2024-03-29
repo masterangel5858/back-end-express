@@ -2,7 +2,8 @@ const express = require('express');
 const serverless = require('serverless-http');
 const app = express();
 const router = express.Router();
-const { getdata, updateStockall,updateMedData, updateStockMed } = require('./GetMedicDetail.js');
+const { getdata } = require('./GetMedicDetail.js');
+const {  updateStockall,updateMedData, updateStockMed } = require('./updatestock.js');
 const { insertData } = require('./insertMedicineLogs.js');
 const {getFormattedDate} = require('./setting.js')
 const {fetchuserdata} = require('./GetUser.js')
@@ -24,6 +25,7 @@ router.get('/getdatauser/:userid', async (req, res) => {
   const userId = req.params.userid;
 
   try {
+    await connectToDatabase();
     const userData = await fetchuserdata(userId);
     
     // Check if userData is empty or null
@@ -37,6 +39,8 @@ router.get('/getdatauser/:userid', async (req, res) => {
   } catch (error) {
     console.error("Error:", error);
     return res.status(500).send("An unexpected error occurred while fetching user data.");
+  } finally{
+    await DisconnectToDatabase();
   }
 });
 
@@ -60,7 +64,6 @@ router.get('/getdatamed/:userid', async (req, res) => {
       return res.json(medicineData);
   } catch (error) {
       console.error("Error:", error);
-      await DisconnectToDatabase();
       return res.status(500).send("An unexpected error occurred.",error);
   } finally {
     await DisconnectToDatabase();
@@ -83,7 +86,6 @@ router.get('/getdatamed/:userid/:time', async (req, res) => {
       console.log(`No medicine data found for user ID: ${userId}`);
       return res.status(404).send(`No medicine data found for user ID: ${userId}`);
     }
-
     // Filter medicine based on the time
     const filteredMedicine = medicineData.Medicine.filter(medicine => {
       return (time === 'Morning' && medicine.Morning) ||
@@ -106,7 +108,9 @@ router.get('/getdatamed/:userid/:time', async (req, res) => {
     return res.json(response);
   } catch (error) {
     console.error("Error:", error);
-    return res.status(500).send("An unexpected error occurred.");
+    return res.status(500).send("An unexpected error occurred.",error);
+  } finally{
+    await DisconnectToDatabase();
   }
 });
 
@@ -118,6 +122,7 @@ router.get('/snoozeall/:userid/:time', async (req, res) => {
   const time = req.params.time;
 
   try {
+    await connectToDatabase();
     // Call the updateNotifyTime function to update the notification time
     await updateNotifyTime(userId, time);
 
@@ -127,6 +132,8 @@ router.get('/snoozeall/:userid/:time', async (req, res) => {
     // Handle errors
     console.error('Error snoozing all notifications:', error);
     res.status(500).send('An error occurred while snoozing all notifications.');
+  } finally{
+    await DisconnectToDatabase();
   }
 });
 
@@ -138,6 +145,7 @@ router.get('/acceptall/:userid/:time', async (req, res) => {
   const time = req.params.time;
 
   try {
+    await connectToDatabase();
     // Fetch medicine data for the specified user ID
     const medicineData = await getdata(userId);
 
@@ -182,6 +190,8 @@ router.get('/acceptall/:userid/:time', async (req, res) => {
   } catch (error) {
     console.error("Error:", error);
     res.status(500).send("An unexpected error occurred.");
+  } finally{
+    await DisconnectToDatabase();
   }
 });
 
@@ -192,6 +202,7 @@ router.get('/accept/:userid/:MedicName', async (req, res) => {
   const medicName = req.params.MedicName;
 
   try {
+    await connectToDatabase();
     // Fetch medicine data for the specified user ID
     const medicineData = await getdata(userId);
     console.log('MedicineData', medicineData);
@@ -232,6 +243,8 @@ router.get('/accept/:userid/:MedicName', async (req, res) => {
   } catch (error) {
     console.error("Error:", error);
     res.status(500).send("An unexpected error occurred.");
+  } finally{
+    await DisconnectToDatabase();
   }
 });
 
