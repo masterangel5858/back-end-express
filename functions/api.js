@@ -118,9 +118,10 @@ router.get('/getdatamed/:userid/:time', async (req, res) => {
 
 //Snoozeall
 //snoozeall/userid/time
-router.get('/snoozeall/:userid/:time', async (req, res) => {
+router.get('/snoozeall/:userid/:time/:timestamp', async (req, res) => {
   const userId = req.params.userid;
   const time = req.params.time;
+  const timestamp = req.params.timestamp;
 
   try {
      // Check if the timestamp has expired
@@ -152,9 +153,10 @@ router.get('/snoozeall/:userid/:time', async (req, res) => {
 
 //AcceptAll
 //acceptall/:userid/:time
-router.get('/acceptall/:userid/:time', async (req, res) => {
+router.get('/acceptall/:userid/:time/:timestamp', async (req, res) => {
   const userId = req.params.userid;
   const time = req.params.time;
+  const timestamp = req.params.timestamp;
 
   try {
      // Check if the timestamp has expired (similar to the Snoozeall route)
@@ -218,9 +220,10 @@ router.get('/acceptall/:userid/:time', async (req, res) => {
 
 //Accept
 //accept/userid/Medicname
-router.get('/accept/:userid/:MedicName', async (req, res) => {
+router.get('/accept/:userid/:MedicName/:timestamp', async (req, res) => {
   const userId = req.params.userid;
   const medicName = req.params.MedicName;
+  const timestamp = req.params.timestamp;
 
   try {
     const currentTime = new Date().getTime();
@@ -230,7 +233,7 @@ router.get('/accept/:userid/:MedicName', async (req, res) => {
     if (currentTime - requestTime > sessionTimeout) {
       return res.status(401).send('Session expired. Please refresh the page.');
     }
-    
+
     await connectToDatabase();
     // Fetch medicine data for the specified user ID
     const medicineData = await getdata(userId);
