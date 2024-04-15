@@ -52,7 +52,6 @@ router.get('/getdatamed/:userid', async (req, res) => {
   const userId = req.params.userid;
 
   try {
-      await connectToDatabase();
       // Fetch all medicine data for the specified user ID
       const medicineData = await getdata(userId);
       
@@ -135,7 +134,6 @@ router.get('/snoozeall/:userid/:time/:timestamp', async (req, res) => {
      }
  
     
-    await connectToDatabase();
     // Call the updateNotifyTime function to update the notification time
     await updateNotifyTime(userId, time);
 
@@ -168,14 +166,12 @@ router.get('/acceptall/:userid/:time/:timestamp', async (req, res) => {
        return res.status(401).send('Session expired. Please refresh the page.');
      }
  
-    await connectToDatabase();
     // Fetch medicine data for the specified user ID
     const medicineData = await getdata(userId);
 
     if (!medicineData) {
       return res.status(404).sendFile(nomedicine);
     }
-
     // Filter medicine based on the time
     const filteredMedicine = medicineData.Medicine.filter(medicine => {
       return (time === 'Morning' && medicine.Morning) ||
@@ -234,7 +230,6 @@ router.get('/accept/:userid/:MedicName/:timestamp', async (req, res) => {
       return res.status(401).send('Session expired. Please refresh the page.');
     }
 
-    await connectToDatabase();
     // Fetch medicine data for the specified user ID
     const medicineData = await getdata(userId);
     console.log('MedicineData', medicineData);
