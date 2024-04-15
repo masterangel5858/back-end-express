@@ -143,8 +143,6 @@ router.get('/snoozeall/:userid/:time/:timestamp', async (req, res) => {
     // Handle errors
     console.error('Error snoozing all notifications:', error);
     res.status(500).send('An error occurred while snoozing all notifications.');
-  } finally{
-    await DisconnectToDatabase();
   }
 });
 
@@ -208,9 +206,8 @@ router.get('/acceptall/:userid/:time/:timestamp', async (req, res) => {
 
   } catch (error) {
     console.error("Error:", error);
+    res.send(error);
     res.status(500).send("An unexpected error occurred.");
-  } finally{
-    await DisconnectToDatabase();
   }
 });
 
@@ -268,9 +265,8 @@ router.get('/accept/:userid/:MedicName/:timestamp', async (req, res) => {
 
   } catch (error) {
     console.error("Error:", error);
+    res.send(error);
     res.status(500).send("An unexpected error occurred.");
-  } finally{
-    await DisconnectToDatabase();
   }
 });
 
