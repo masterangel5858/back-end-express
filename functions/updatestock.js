@@ -2,9 +2,10 @@ const { getdata, getMedicine } = require('./GetMedicDetail.js');
 const { connectToDatabase, DisconnectToDatabase, client, dbName } = require('./connecteddatabase');
 
 async function updateMedData(LineID, updatedMedicines) {
+    let db;
+
     try {
-        const db = client.db(dbName);
-        const col = db.collection("MedicDetail");
+        db = client.db(dbName);
 
         // Construct bulk write operations
         const bulkOperations = updatedMedicines.map(updatedMedicine => ({
@@ -15,9 +16,9 @@ async function updateMedData(LineID, updatedMedicines) {
         }));
 
         // Execute bulk write operations
-        await col.bulkWrite(bulkOperations);
+        const result = await db.collection("MedicDetail").bulkWrite(bulkOperations);
 
-        console.log('Medicine data updated successfully.');
+        console.log('Medicine data updated successfully:', result);
     } catch (error) {
         console.error("Error updating medicine data:", error);
         throw error;
@@ -27,7 +28,7 @@ async function updateMedData(LineID, updatedMedicines) {
 async function updateStockMed(LineID, MedicName) {
     try {
         const medicine = await getMedicine(LineID);
-
+        await connectToDatabase(); // Ensure connection is established before proceeding
         if (!medicine || !medicine.Medicine) {
             throw new Error('No medicine data found');
         }
@@ -45,29 +46,30 @@ async function updateStockMed(LineID, MedicName) {
     } catch (error) {
         console.error('Error updating stock:', error);
         throw error;
+    } finally {
+        await DisconnectToDatabase(); // Disconnect after operations are completed
     }
 }
 
 async function updateStockall(LineID, time) {
     try {
-        await connectToDatabase();
         const medicines = await getdata(LineID);
-
+        await connectToDatabase(); // Ensure connection is established before proceeding
         if (!medicines || !medicines.Medicine) {
             throw new Error('No medicine data found');
         }
 
         const matchingMedicines = medicines.Medicine.filter(medicine => medicine[time]);
 
-        // Update the stock of matching medicines sequentially
-        for (const medicine of matchingMedicines) {
-            await updateStockMed(LineID, medicine.MedicName);
-        }
+        // Update the stock of matching medicines concurrently
+        await Promise.all(matchingMedicines.map(async (medicine) => {
+            return updateStockMed(LineID, medicine.MedicName);
+        }));
     } catch (error) {
         console.error('Error updating stock:', error);
         throw error;
     } finally {
-        await DisconnectToDatabase();
+        await DisconnectToDatabase(); // Disconnect after operations are completed
     }
 }
 

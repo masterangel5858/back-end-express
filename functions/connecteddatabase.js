@@ -14,27 +14,29 @@ async function connectToDatabase() {
             await client.connect();
             isConnected = true;
             console.log("Connected to MongoDB");
+        } else {
+            console.log("Already connected to MongoDB");
         }
-        else console.log("There is session Remain")
     } catch (error) {
         console.error("Error connecting to MongoDB:", error);
-        throw error;
+        throw error; // Propagate the error to the caller for handling
     }
 }
 
 async function DisconnectToDatabase() {
     try {
-        if (isConnected){
+        if (isConnected) {
             await client.close();
-            console.log("Disconnected Database")
             isConnected = false;
+            console.log("Disconnected from MongoDB");
+        } else {
+            console.log("Already disconnected from MongoDB");
         }
-    } catch(err){
-        console.log('error to disconected to database',err);
-        throw err;
+    } catch (error) {
+        console.error("Error disconnecting from MongoDB:", error);
+        throw error; // Propagate the error to the caller for handling
     }
 }
-
 
 module.exports = {
     connectToDatabase,
