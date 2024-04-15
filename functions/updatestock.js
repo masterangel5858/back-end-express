@@ -1,29 +1,49 @@
 const { getdata, getMedicine } = require('./GetMedicDetail.js');
 const { connectToDatabase, DisconnectToDatabase, client, dbName } = require('./connecteddatabase');
 
-async function updateMedData(LineID, updatedMedicines) {
-    let db;
 
+async function updateMedData(LineID, updatedMedicines, db) {
     try {
-        db = client.db(dbName);
+        const col = db.collection("MedicDetail");
 
-        // Construct bulk write operations
-        const bulkOperations = updatedMedicines.map(updatedMedicine => ({
-            updateOne: {
-                filter: { LineID: LineID, 'Medicine.MedicName': updatedMedicine.MedicName },
-                update: { $set: { 'Medicine.$.stock': updatedMedicine.stock } }
-            }
-        }));
+        // Update each document individually
+        for (const updatedMedicine of updatedMedicines) {
+            const filter = { LineID: LineID, 'Medicine.MedicName': updatedMedicine.MedicName };
+            const update = { $set: { 'Medicine.$.stock': updatedMedicine.stock } };
+            await col.updateOne(filter, update);
+        }
 
-        // Execute bulk write operations
-        const result = await db.collection("MedicDetail").bulkWrite(bulkOperations);
-
-        console.log('Medicine data updated successfully:', result);
+        console.log('Medicine data updated successfully.');
     } catch (error) {
         console.error("Error updating medicine data:", error);
         throw error;
     }
 }
+
+
+// async function updateMedData(LineID, updatedMedicines) {
+//     let db;
+
+//     try {
+//         db = client.db(dbName);
+
+//         // Construct bulk write operations
+//         const bulkOperations = updatedMedicines.map(updatedMedicine => ({
+//             updateOne: {
+//                 filter: { LineID: LineID, 'Medicine.MedicName': updatedMedicine.MedicName },
+//                 update: { $set: { 'Medicine.$.stock': updatedMedicine.stock } }
+//             }
+//         }));
+
+//         // Execute bulk write operations
+//         const result = await db.collection("MedicDetail").bulkWrite(bulkOperations);
+
+//         console.log('Medicine data updated successfully:', result);
+//     } catch (error) {
+//         console.error("Error updating medicine data:", error);
+//         throw error;
+//     }
+// }
 
 async function updateStockMed(LineID, MedicName) {
     try {
