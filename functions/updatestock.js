@@ -3,7 +3,6 @@ const { connectToDatabase, DisconnectToDatabase, client, dbName } = require('./c
 
 async function updateMedData(LineID, updatedMedicines) {
     try {
-        await connectToDatabase();
         const db = client.db(dbName);
         const col = db.collection("MedicDetail");
 
@@ -22,8 +21,6 @@ async function updateMedData(LineID, updatedMedicines) {
     } catch (error) {
         console.error("Error updating medicine data:", error);
         throw error;
-    } finally {
-        await DisconnectToDatabase();
     }
 }
 
@@ -53,6 +50,7 @@ async function updateStockMed(LineID, MedicName) {
 
 async function updateStockall(LineID, time) {
     try {
+        await connectToDatabase();
         const medicines = await getdata(LineID);
 
         if (!medicines || !medicines.Medicine) {
@@ -61,13 +59,15 @@ async function updateStockall(LineID, time) {
 
         const matchingMedicines = medicines.Medicine.filter(medicine => medicine[time]);
 
-        // Update the stock of matching medicines concurrently
-        await Promise.all(matchingMedicines.map(async (medicine) => {
-            return updateStockMed(LineID, medicine.MedicName);
-        }));
+        // Update the stock of matching medicines sequentially
+        for (const medicine of matchingMedicines) {
+            await updateStockMed(LineID, medicine.MedicName);
+        }
     } catch (error) {
         console.error('Error updating stock:', error);
         throw error;
+    } finally {
+        await DisconnectToDatabase();
     }
 }
 
