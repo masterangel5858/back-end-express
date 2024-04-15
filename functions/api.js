@@ -206,7 +206,6 @@ router.get('/acceptall/:userid/:time/:timestamp', async (req, res) => {
 
   } catch (error) {
     console.error("Error:", error);
-    res.send(error);
     res.status(500).send("An unexpected error occurred.");
   }
 });
@@ -265,7 +264,6 @@ router.get('/accept/:userid/:MedicName/:timestamp', async (req, res) => {
 
   } catch (error) {
     console.error("Error:", error);
-    res.send(error);
     res.status(500).send("An unexpected error occurred.");
   }
 });
