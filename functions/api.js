@@ -123,6 +123,17 @@ router.get('/snoozeall/:userid/:time', async (req, res) => {
   const time = req.params.time;
 
   try {
+     // Check if the timestamp has expired
+     const currentTime = new Date().getTime();
+     const sessionTimeout = 5 * 60 * 1000; // 5 minutes in milliseconds
+     const requestTime = parseInt(timestamp, 10); // Parse timestamp as integer
+ 
+     if (currentTime - requestTime > sessionTimeout) {
+       // Session has expired, return an error response
+       return res.status(401).send('Session expired. Please refresh the page.');
+     }
+ 
+    
     await connectToDatabase();
     // Call the updateNotifyTime function to update the notification time
     await updateNotifyTime(userId, time);
@@ -146,6 +157,15 @@ router.get('/acceptall/:userid/:time', async (req, res) => {
   const time = req.params.time;
 
   try {
+     // Check if the timestamp has expired (similar to the Snoozeall route)
+     const currentTime = new Date().getTime();
+     const sessionTimeout = 5 * 60 * 1000; // 5 minutes in milliseconds
+     const requestTime = parseInt(timestamp, 10);
+ 
+     if (currentTime - requestTime > sessionTimeout) {
+       return res.status(401).send('Session expired. Please refresh the page.');
+     }
+ 
     await connectToDatabase();
     // Fetch medicine data for the specified user ID
     const medicineData = await getdata(userId);
@@ -203,6 +223,14 @@ router.get('/accept/:userid/:MedicName', async (req, res) => {
   const medicName = req.params.MedicName;
 
   try {
+    const currentTime = new Date().getTime();
+    const sessionTimeout = 5 * 60 * 1000; // 5 minutes in milliseconds
+    const requestTime = parseInt(timestamp, 10);
+
+    if (currentTime - requestTime > sessionTimeout) {
+      return res.status(401).send('Session expired. Please refresh the page.');
+    }
+    
     await connectToDatabase();
     // Fetch medicine data for the specified user ID
     const medicineData = await getdata(userId);
