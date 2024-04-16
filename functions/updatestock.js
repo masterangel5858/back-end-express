@@ -52,6 +52,7 @@ async function updateMedData(LineID, updatedMedicines) {
 async function updateStockMed(LineID, MedicName) {
     try {
         const medicine = await getMedicine(LineID);
+        await connectToDatabase();
         if (!medicine || !medicine.Medicine) {
             throw new Error('No medicine data found');
         }
@@ -75,7 +76,7 @@ async function updateStockMed(LineID, MedicName) {
 async function updateStockall(LineID, time) {
     try {
         const medicines = await getdata(LineID);
-
+        await connectToDatabase();
         if (!medicines || !medicines.Medicine) {
             throw new Error('No medicine data found');
         }
