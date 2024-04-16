@@ -20,9 +20,6 @@ const Snooze = path.join(__dirname, 'templates', 'loading.html');
 const currentTime = new Date().toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Bangkok' });
 const currentDate = getFormattedDate();
 
-app.get('/', (req, res) => {
-  res.send('Hello World!')
-})
 
 router.get('/', async (req, res) => {
   res.send("setup")
@@ -286,8 +283,12 @@ router.get('/accept/:userid/:MedicName/:timestamp', async (req, res) => {
 //   console.log(`Listening on port ${port}...`);
 // });
 
+app.use('/', router);
+
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`)
 })
+
+
 
 module.exports = router;
