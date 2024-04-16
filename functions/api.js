@@ -9,17 +9,22 @@ const { insertData } = require('./insertMedicineLogs.js');
 const {getFormattedDate} = require('./setting.js')
 const {fetchuserdata} = require('./GetUser.js')
 const {updateNotifyTime} = require('./GetNotifytime.js')
+const { checkDuplicateLink } = require('./check-process.js');
 const path = require('path'); // Import the path module
 const { connectToDatabase, DisconnectToDatabase ,client} = require('./connecteddatabase.js');
+const { link } = require('fs');
 //html path setting
 const successFilePath = path.join(__dirname, 'templates', 'success.html');
 const nomedicine = path.join(__dirname, 'templates', 'no-medicine.html');
 const loading = path.join(__dirname, 'templates', 'loading.html');
 const Snooze = path.join(__dirname, 'templates', 'Snooze.html');
 const sessionexpire = path.join(__dirname, 'templates', 'session-expire.html');
+const mutipleclick = path.join(__dirname, 'templates', 'Mutipleclick.html');
 //time config
-const currentTime = new Date().toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Bangkok' });
+const currentTimeString = new Date().toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Bangkok' });
 const currentDate = getFormattedDate();
+const { v4: uuidv4 } = require('uuid'); // Import uuidv4 for generating unique tokens
+
 
 
 router.get('/', async (req, res) => {
@@ -162,6 +167,7 @@ router.get('/acceptall/:userid/:time/:timestamp', async (req, res) => {
   const userId = req.params.userid;
   const time = req.params.time;
   const timestamp = req.params.timestamp;
+  const url = req.url; // Use req.url directly
 
   try {
      // Check if the timestamp has expired (similar to the Snoozeall route)
@@ -172,7 +178,13 @@ router.get('/acceptall/:userid/:time/:timestamp', async (req, res) => {
      if (currentTime - requestTime > sessionTimeout) {
        return res.sendFile(sessionexpire);
      }
- 
+     
+     const isDuplicateLink = await checkDuplicateLink(url, userId);
+        if (isDuplicateLink) {
+            return res.sendFile(mutipleclick);
+        }
+
+
     // Fetch medicine data for the specified user ID
     const medicineData = await getdata(userId);
 
@@ -193,6 +205,7 @@ router.get('/acceptall/:userid/:time/:timestamp', async (req, res) => {
     // Insert each medicine into the database
     const insertedMedicines = [];
     for (const medicine of filteredMedicine) {
+      const linkToken = uuidv4(); // Generate a unique token
       const newMedicineData = {
         LineID: userId,
         MedicName: medicine.MedicName,
@@ -204,7 +217,8 @@ router.get('/acceptall/:userid/:time/:timestamp', async (req, res) => {
         MedicPicture: medicine.MedicPicture,
         status: medicine.Status,
         datestamp: currentDate,
-        timestamp: currentTime
+        timestamp: currentTimeString,
+        url: req.url
       };
       insertedMedicines.push(newMedicineData);
       insertData(newMedicineData);
@@ -225,6 +239,7 @@ router.get('/accept/:userid/:MedicName/:timestamp', async (req, res) => {
   const userId = req.params.userid;
   const medicName = req.params.MedicName;
   const timestamp = req.params.timestamp;
+  const url = req.url; // Use req.url directly
 
   try {
     const currentTime = new Date().getTime();
@@ -234,6 +249,11 @@ router.get('/accept/:userid/:MedicName/:timestamp', async (req, res) => {
    if (currentTime - requestTime > sessionTimeout) {
        return res.sendFile(sessionexpire);
      }
+     
+     const isDuplicateLink = await checkDuplicateLink(url, userId);
+        if (isDuplicateLink) {
+          return res.sendFile(mutipleclick);
+        }
 
     // Fetch medicine data for the specified user ID
     const medicineData = await getdata(userId);
@@ -264,7 +284,8 @@ router.get('/accept/:userid/:MedicName/:timestamp', async (req, res) => {
       MedicPicture: selectedMedicine.MedicPicture,
       Status: selectedMedicine.Status,
       datestamp: currentDate,
-      timestamp: currentTime
+      timestamp: currentTimeString,
+      url: req.url
     };
     insertData(newMedicineData);
 
