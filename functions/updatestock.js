@@ -25,6 +25,29 @@ async function updateMedData(LineID, updatedMedicines) {
         }
     }
 
+    // async function updateMedData(LineID, updatedMedicines) {
+    //     try {
+    //         await connectToDatabase();
+    //         const db = client.db(dbName);
+    //         const col = db.collection("MedicDetail");
+    
+    //         // Loop through each updated medicine
+    //         for (const updatedMedicine of updatedMedicines) {
+    //             const filter = { LineID: LineID, 'Medicine.MedicName': updatedMedicine.MedicName };
+    //             const updateOperation = { $set: { 'Medicine.$.stock': updatedMedicine.stock } };
+    
+    //             // Update the stock value of the medicine
+    //             await col.updateOne(filter, updateOperation);
+    //         }
+    
+    //         console.log('Medicine data updated successfully.');
+    //     } catch (error) {
+    //         console.error("Error updating medicine data:", error);
+    //         throw error; // Re-throw the error to handle it outside the function
+    //     } finally{
+    //         await DisconnectToDatabase();
+    //       }
+    // }
 // async function updateMedData(LineID, updatedMedicines) {
 //     let db;
 
