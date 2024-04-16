@@ -1,6 +1,7 @@
 const express = require('express');
 const serverless = require('serverless-http');
 const app = express();
+const port = process.env.PORT || 8080;
 const router = express.Router();
 const { getdata } = require('./GetMedicDetail.js');
 const {  updateStockall,updateMedData, updateStockMed } = require('./updatestock.js');
@@ -18,6 +19,14 @@ const Snooze = path.join(__dirname, 'templates', 'loading.html');
 //time config
 const currentTime = new Date().toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Bangkok' });
 const currentDate = getFormattedDate();
+
+
+
+router.get('/', async (req, res) => {
+  res.send("setup")
+  
+});
+
 
 
 //***Route
@@ -271,7 +280,8 @@ router.get('/accept/:userid/:MedicName/:timestamp', async (req, res) => {
 
 
 
+// app.listen(port, () => {
+//   console.log(`Listening on port ${port}...`);
+// });
 
-
-app.use('/.netlify/functions/api', router);
-module.exports.handler = serverless(app);
+module.exports = router;
