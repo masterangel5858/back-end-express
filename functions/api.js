@@ -23,7 +23,6 @@ const mutipleclick = path.join(__dirname, 'templates', 'Mutipleclick.html');
 //time config
 const currentTimeString = new Date().toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Bangkok' });
 const currentDate = getFormattedDate();
-const { v4: uuidv4 } = require('uuid'); // Import uuidv4 for generating unique tokens
 
 
 
@@ -205,7 +204,6 @@ router.get('/acceptall/:userid/:time/:timestamp', async (req, res) => {
     // Insert each medicine into the database
     const insertedMedicines = [];
     for (const medicine of filteredMedicine) {
-      const linkToken = uuidv4(); // Generate a unique token
       const newMedicineData = {
         LineID: userId,
         MedicName: medicine.MedicName,
