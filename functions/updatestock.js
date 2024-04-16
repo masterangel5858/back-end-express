@@ -75,6 +75,7 @@ async function updateMedData(LineID, updatedMedicines) {
 async function updateStockMed(LineID, MedicName) {
     try {
         const medicine = await getMedicine(LineID);
+        console.log('update stock by one ',LineID,MedicName)
         await connectToDatabase();
         if (!medicine || !medicine.Medicine) {
             throw new Error('No medicine data found');
@@ -93,12 +94,16 @@ async function updateStockMed(LineID, MedicName) {
     } catch (error) {
         console.error('Error updating stock:', error);
         throw error;
-    }
+    } finally{
+        console.log("update stock by one Done");
+        await DisconnectToDatabase();
+      }
 }
 
 async function updateStockall(LineID, time) {
     try {
         const medicines = await getdata(LineID);
+        console.log('update stock by all ',LineID,time)
         await connectToDatabase();
         if (!medicines || !medicines.Medicine) {
             throw new Error('No medicine data found');
@@ -106,15 +111,25 @@ async function updateStockall(LineID, time) {
 
         const matchingMedicines = medicines.Medicine.filter(medicine => medicine[time]);
 
-        // Update the stock of matching medicines concurrently
-        await Promise.all(matchingMedicines.map(async (medicine) => {
-            return updateStockMed(LineID, medicine.MedicName);
-        }));
+        // Sequentially update the stock of matching medicines
+        for (const medicine of matchingMedicines) {
+            await updateStockMed(LineID, medicine.MedicName);
+        }
+
+        // // Update the stock of matching medicines concurrently
+// await Promise.all(matchingMedicines.map(async (medicine) => {
+//     return updateStockMed(LineID, medicine.MedicName);
+
     } catch (error) {
         console.error('Error updating stock:', error);
         throw error;
-    }
+    } finally{
+        console.log("update stock by all Done");
+        await DisconnectToDatabase();
+      }
 }
+
+
 
 module.exports = {
     updateStockMed,

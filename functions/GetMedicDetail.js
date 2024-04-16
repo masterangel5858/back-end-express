@@ -4,6 +4,7 @@ const { MongoClient } = require("mongodb");
 async function getMedicine(userId) {
     try {
         await connectToDatabase();
+        console.log("Get medicine process for ",userId);
         const db = client.db(dbName);
         const col = db.collection("MedicDetail");
 
@@ -25,6 +26,7 @@ async function getMedicine(userId) {
         console.error("Error:", error);
         throw error; // Re-throw the error to handle it outside the function
     } finally{
+        console.log("Get medicine process Done");
         await DisconnectToDatabase();
       }
 }

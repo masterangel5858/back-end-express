@@ -5,6 +5,7 @@ const { MongoClient } = require("mongodb");
 async function checkDuplicateLink(url, userId) {
     try {
         await connectToDatabase();
+        console.log("checking link process for ",url , userId);
         const db = client.db(dbName);
         const col = db.collection("MedicineLogs");
 
@@ -19,6 +20,7 @@ async function checkDuplicateLink(url, userId) {
         console.error("Error checking duplicate link:", error);
         throw error;
     } finally {
+        console.log("checking link process done");
         await DisconnectToDatabase();
     }
 }
