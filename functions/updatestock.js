@@ -1,25 +1,29 @@
 const { getdata, getMedicine } = require('./GetMedicDetail.js');
 const { connectToDatabase, DisconnectToDatabase, client, dbName } = require('./connecteddatabase');
 
-
-async function updateMedData(LineID, updatedMedicines, db) {
+async function updateMedData(LineID, updatedMedicines) {
     try {
+        const db = client.db(dbName);
         const col = db.collection("MedicDetail");
-
         // Update each document individually
-        for (const updatedMedicine of updatedMedicines) {
-            const filter = { LineID: LineID, 'Medicine.MedicName': updatedMedicine.MedicName };
-            const update = { $set: { 'Medicine.$.stock': updatedMedicine.stock } };
-            await col.updateOne(filter, update);
+        // Construct bulk write operations
+        const bulkOperations = updatedMedicines.map(updatedMedicine => ({
+            updateOne: {
+                filter: { LineID: LineID, 'Medicine.MedicName': updatedMedicine.MedicName },
+                update: { $set: { 'Medicine.$.stock': updatedMedicine.stock } }
+            }
+        }));
+         // Execute bulk write operations
+         await col.bulkWrite(bulkOperations);
+
+         console.log('Medicine data updated successfully.');
+     } catch (error) {
+         console.error("Error updating medicine data:", error);
+         throw error;
+        } finally {
+            await DisconnectToDatabase();
         }
-
-        console.log('Medicine data updated successfully.');
-    } catch (error) {
-        console.error("Error updating medicine data:", error);
-        throw error;
     }
-}
-
 
 // async function updateMedData(LineID, updatedMedicines) {
 //     let db;
@@ -48,7 +52,6 @@ async function updateMedData(LineID, updatedMedicines, db) {
 async function updateStockMed(LineID, MedicName) {
     try {
         const medicine = await getMedicine(LineID);
-        await connectToDatabase(); // Ensure connection is established before proceeding
         if (!medicine || !medicine.Medicine) {
             throw new Error('No medicine data found');
         }
@@ -66,15 +69,13 @@ async function updateStockMed(LineID, MedicName) {
     } catch (error) {
         console.error('Error updating stock:', error);
         throw error;
-    } finally {
-        await DisconnectToDatabase(); // Disconnect after operations are completed
     }
 }
 
 async function updateStockall(LineID, time) {
     try {
         const medicines = await getdata(LineID);
-        await connectToDatabase(); // Ensure connection is established before proceeding
+
         if (!medicines || !medicines.Medicine) {
             throw new Error('No medicine data found');
         }
@@ -88,8 +89,6 @@ async function updateStockall(LineID, time) {
     } catch (error) {
         console.error('Error updating stock:', error);
         throw error;
-    } finally {
-        await DisconnectToDatabase(); // Disconnect after operations are completed
     }
 }
 
