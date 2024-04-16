@@ -1,5 +1,0 @@
-[build]
-    functions = "functions"
-
-[functions]
-  included_files = ["./functions/templates/**"]
