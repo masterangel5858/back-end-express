@@ -3,6 +3,7 @@ const { MongoClient } = require("mongodb");
 
 async function insertData(data) {
     try {
+        console.log('try to insert data');
         await connectToDatabase();
         const db = client.db(dbName);
         const col = db.collection("MedicineLogs");
@@ -15,6 +16,7 @@ async function insertData(data) {
         console.error("Error:", error);
         throw error;
     } finally {
+        console.log('insert data completed');
         await DisconnectToDatabase();
     }
 }
