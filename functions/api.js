@@ -183,7 +183,7 @@ router.get('/acceptall/:userid/:time/:timestamp', async (req, res) => {
             return res.sendFile(mutipleclick);
         }
 
-        console.log('attempt accept all for ' ,userid)
+        console.log('attempt accept all for ' ,userId)
     // Fetch medicine data for the specified user ID
     const medicineData = await getdata(userId);
 
@@ -242,7 +242,7 @@ router.get('/accept/:userid/:MedicName/:timestamp', async (req, res) => {
   const url = req.url; // Use req.url directly
 
   try {
-    console.log('attempt accept one for ' ,userid,medicName);
+    console.log('attempt accept one for ' ,userId,medicName);
     const currentTime = new Date().getTime();
     const sessionTimeout = 5 * 60 * 1000; // 5 minutes in milliseconds
     const requestTime = parseInt(timestamp, 10);
