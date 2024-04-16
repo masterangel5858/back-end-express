@@ -202,6 +202,7 @@ router.get('/acceptall/:userid/:time/:timestamp', async (req, res) => {
     }
     await updateStockall(userId,time);
     // Insert each medicine into the database
+    await connectToDatabase();
     const insertedMedicines = [];
     for (const medicine of filteredMedicine) {
       const newMedicineData = {
@@ -219,8 +220,9 @@ router.get('/acceptall/:userid/:time/:timestamp', async (req, res) => {
         url: req.url
       };
       insertedMedicines.push(newMedicineData);
-      insertData(newMedicineData);
+      await insertData(newMedicineData);
     }
+    await DisconnectToDatabase();
 
     // Send the success page after completing the operations
     res.sendFile(successFilePath);
@@ -271,6 +273,7 @@ router.get('/accept/:userid/:MedicName/:timestamp', async (req, res) => {
       return res.send(`No medicine found with the name: ${medicName}`);
     }
     await updateStockMed(userId,medicName);
+    await connectToDatabase();
     const newMedicineData = {
       LineID: userId,
       MedicName: selectedMedicine.MedicName,
@@ -286,7 +289,8 @@ router.get('/accept/:userid/:MedicName/:timestamp', async (req, res) => {
       url: req.url
     };
     insertData(newMedicineData);
-
+    await DisconnectToDatabase();
+    
     // Send the success page after completing the operation
     res.sendFile(successFilePath);
 
