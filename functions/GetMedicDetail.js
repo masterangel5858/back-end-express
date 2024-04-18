@@ -1,10 +1,9 @@
 const {connectToDatabase,DisconnectToDatabase,client,dbName} = require('./connecteddatabase')
 const { MongoClient } = require("mongodb");
-
 async function getMedicine(userId) {
     try {
         await connectToDatabase();
-        console.log("Get medicine process for ",userId);
+        console.log("Get medicine process for ", userId);
         const db = client.db(dbName);
         const col = db.collection("MedicDetail");
 
@@ -13,11 +12,23 @@ async function getMedicine(userId) {
 
         // Return the Medicine array if document exists
         if (document && Array.isArray(document.Medicine)) {
-            return {
+            const medicIDs = document.Medicine;
+            const medicCol = db.collection("MedicineList");
+
+            // Find detailed medicine information for each medicID in the array
+            const detailedMedicines = await Promise.all(medicIDs.map(async (medicID) => {
+                return await medicCol.findOne({ MedicID: medicID });
+            }));
+
+            // Construct the output similar to the original structure
+            const output = {
                 _id: document._id,
                 LineID: document.LineID,
-                Medicine: document.Medicine
+                Medicine: detailedMedicines
             };
+
+            return output;
+
         } else {
             return null; // Return null if no matching document or Medicine array
         }
@@ -25,11 +36,12 @@ async function getMedicine(userId) {
     } catch (error) {
         console.error("Error:", error);
         throw error; // Re-throw the error to handle it outside the function
-    } finally{
+    } finally {
         console.log("Get medicine process Done");
         await DisconnectToDatabase();
-      }
+    }
 }
+
 
 /**
  * find Med data that contain userid

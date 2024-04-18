@@ -207,6 +207,7 @@ router.get('/acceptall/:userid/:time/:timestamp', async (req, res) => {
     for (const medicine of filteredMedicine) {
       const newMedicineData = {
         LineID: userId,
+        MedicID: medicine.MedicID,
         MedicName: medicine.MedicName,
         Morning: medicine.Morning,
         Noon: medicine.Noon,
@@ -277,6 +278,7 @@ router.get('/accept/:userid/:MedicName/:timestamp', async (req, res) => {
     await connectToDatabase();
     const newMedicineData = {
       LineID: userId,
+      MedicID: selectedMedicine.MedicID,
       MedicName: selectedMedicine.MedicName,
       Morning: selectedMedicine.Morning,
       Noon: selectedMedicine.Noon,
