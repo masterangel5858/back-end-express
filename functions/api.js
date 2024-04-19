@@ -259,15 +259,15 @@ router.get('/acceptall/:userid/:time/:timestamp', async (req, res) => {
 });
 
 //Accept
-//accept/userid/Medicname
-router.get('/accept/:userid/:MedicName/:timestamp', async (req, res) => {
+//accept/userid/MedicID
+router.get('/accept/:userid/:MedicID/:timestamp', async (req, res) => {
   const userId = req.params.userid;
-  const medicName = req.params.MedicName;
+  const MedicID = req.params.MedicID;
   const timestamp = req.params.timestamp;
   const url = req.url; // Use req.url directly
 
   try {
-    console.log('attempt accept one for ' ,userId,medicName);
+    console.log('attempt accept one for ' ,userId,MedicID);
     const currentTime = new Date().getTime();
     const sessionTimeout = 5 * 60 * 1000; // 5 minutes in milliseconds
     const requestTime = parseInt(timestamp, 10);
@@ -284,7 +284,7 @@ router.get('/accept/:userid/:MedicName/:timestamp', async (req, res) => {
     // Fetch medicine data for the specified user ID
     const medicineData = await getdata(userId);
     console.log('MedicineData', medicineData);
-    console.log('MedicName', medicName);
+    console.log('MedicID', MedicID);
 
     if (!medicineData) {
       return res.status(404).send(`No medicine data found for user ID: ${userId}`);
@@ -292,13 +292,13 @@ router.get('/accept/:userid/:MedicName/:timestamp', async (req, res) => {
 
     // Find the medicine with the specified name
     const selectedMedicine = medicineData.Medicine.find(medicine => {
-      return medicine.MedicName === medicName;
+      return medicine.MedicID === MedicID;
     });
 
     if (!selectedMedicine) {
-      return res.send(`No medicine found with the name: ${medicName}`);
+      return res.send(`No medicine found with the name: ${MedicID}`);
     }
-    await updateStockMed(userId,medicName);
+    await updateStockMed(userId,MedicID);
     await connectToDatabase();
     const newMedicineData = {
       LineID: userId,

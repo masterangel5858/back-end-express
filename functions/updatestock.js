@@ -1,18 +1,19 @@
 const { getdata, getMedicine } = require('./GetMedicDetail.js');
 const { connectToDatabase, DisconnectToDatabase, client, dbName } = require('./connecteddatabase');
-
-async function updateMedData(LineID, updatedMedicines) {
+async function updateMedData(updatedMedicines) {
     try {
+        console.log(updateMedData);
         const db = client.db(dbName);
-        const col = db.collection("MedicDetail");
+        const col = db.collection("MedicineList");
         // Update each document individually
         // Construct bulk write operations
         const bulkOperations = updatedMedicines.map(updatedMedicine => ({
             updateOne: {
-                filter: { LineID: LineID, 'Medicine.MedicName': updatedMedicine.MedicName },
-                update: { $set: { 'Medicine.$.stock': updatedMedicine.stock } }
+                filter: {'MedicID': updatedMedicine.MedicID },
+                update: { $set: { 'stock': updatedMedicine.stock } }
             }
-        }));
+        }))
+
          // Execute bulk write operations
          await col.bulkWrite(bulkOperations);
 
@@ -72,24 +73,28 @@ async function updateMedData(LineID, updatedMedicines) {
 //     }
 // }
 
-async function updateStockMed(LineID, MedicName) {
+async function updateStockMed(LineID, MedicID) {
     try {
         const medicine = await getMedicine(LineID);
-        console.log('update stock by one ',LineID,MedicName)
+        console.log('update stock by one ',LineID,MedicID)
+
         await connectToDatabase();
         if (!medicine || !medicine.Medicine) {
             throw new Error('No medicine data found');
         }
 
-        const targetMedicine = medicine.Medicine.find(med => med.MedicName === MedicName);
+        const targetMedicine = medicine.Medicine.find(med => med.MedicID === MedicID);
 
         if (targetMedicine) {
             targetMedicine.stock -= 1;
-
-            await updateMedData(LineID, [targetMedicine]);
-            console.log(`Stock for medicine '${MedicName}' updated successfully.`);
+            console.log(targetMedicine);
+            const packedmedicine = { MedicID: targetMedicine.MedicID, stock: targetMedicine.stock }
+            console.log("package",packedmedicine)
+            await updateMedData([packedmedicine]);
+            
+            console.log(`Stock for medicine '${MedicID}' updated successfully.`);
         } else {
-            throw new Error(`Medicine '${MedicName}' not found for LineID '${LineID}'`);
+            throw new Error(`Medicine '${MedicID}' not found for LineID '${LineID}'`);
         }
     } catch (error) {
         console.error('Error updating stock:', error);
@@ -113,7 +118,7 @@ async function updateStockall(LineID, time) {
 
         // Sequentially update the stock of matching medicines
         for (const medicine of matchingMedicines) {
-            await updateStockMed(LineID, medicine.MedicName);
+            await updateStockMed(LineID, medicine.MedicID);
         }
 
         // // Update the stock of matching medicines concurrently
