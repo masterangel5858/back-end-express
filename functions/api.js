@@ -12,6 +12,7 @@ const {updateNotifyTime} = require('./GetNotifytime.js')
 const { checkDuplicateLink } = require('./check-process.js');
 const path = require('path'); // Import the path module
 const { connectToDatabase, DisconnectToDatabase ,client} = require('./connecteddatabase.js');
+const { fetchusermember,getmanageuser } = require('./GetManageUser.js')
 const { link } = require('fs');
 //html path setting
 const successFilePath = path.join(__dirname, 'templates', 'success.html');
@@ -24,6 +25,29 @@ const mutipleclick = path.join(__dirname, 'templates', 'Mutipleclick.html');
 const currentTimeString = new Date().toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Bangkok' });
 const currentDate = getFormattedDate();
 
+
+router.get('/getmanageuser/:userid', async (req,res)=>{
+  const userId = req.params.userid;
+
+  try {
+    await connectToDatabase();
+    const manageuser = await fetchusermember(userId);
+  
+    if (!manageuser || Object.keys(manageuser).length === 0) {
+      console.log(`No user data found for user ID: ${userId}`);
+      return res.send(`No user data found for user ID: ${userId}`);
+    }
+    
+    // User data found, return it
+    return res.json(manageuser);
+  } catch (error) {
+    console.error("Error:", error);
+    return res.status(500).send("An unexpected error occurred while fetching user data.");
+  } finally{
+    await DisconnectToDatabase();
+  }
+
+});
 
 
 router.get('/', async (req, res) => {
