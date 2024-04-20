@@ -9,6 +9,7 @@ const { insertData } = require('./insertMedicineLogs.js');
 const {getFormattedDate} = require('./setting.js')
 const {fetchuserdata} = require('./GetUser.js')
 const {updateNotifyTime} = require('./GetNotifytime.js')
+const {fetchMedDatabyDate,getMedDataByDate} = require('./GetMedDataByDate.js')
 const { checkDuplicateLink } = require('./check-process.js');
 const path = require('path'); // Import the path module
 const { connectToDatabase, DisconnectToDatabase ,client} = require('./connecteddatabase.js');
@@ -26,13 +27,38 @@ const currentTimeString = new Date().toLocaleTimeString('en-US', { hour12: false
 const currentDate = getFormattedDate();
 
 
+
+router.get('/getmeddatabydate/:userid/:date', async (req,res)=>{
+  const userId = req.params.userid;
+  const date = req.params.date
+
+  try {
+    // Fetch all medicine data for the specified user ID
+    const medicineData = await fetchMedDatabyDate(userId,date);
+    
+    if (!medicineData) {
+        console.log(`No medicine data found for user ID: ${userId}`);
+        return res.status(404).send(`No medicine data found for user ID: ${userId}`);
+    }
+
+    // Send the fetched medicine data as a response
+    return res.json(medicineData);
+} catch (error) {
+    console.error("Error:", error);
+    return res.status(500).send("An unexpected error occurred.",error);
+} finally {
+  await DisconnectToDatabase();
+}
+
+});
+
 router.get('/getmanageuser/:userid', async (req,res)=>{
   const userId = req.params.userid;
 
   try {
     await connectToDatabase();
     const manageuser = await fetchusermember(userId);
-  
+    
     if (!manageuser || Object.keys(manageuser).length === 0) {
       console.log(`No user data found for user ID: ${userId}`);
       return res.send(`No user data found for user ID: ${userId}`);
@@ -109,6 +135,7 @@ router.get('/getdatamed/:userid', async (req, res) => {
 });
 
 
+
 //***Route
 //getdatamed/userid/time
 router.get('/getdatamed/:userid/:time', async (req, res) => {
@@ -150,6 +177,52 @@ router.get('/getdatamed/:userid/:time', async (req, res) => {
     await DisconnectToDatabase();
   }
 });
+
+
+router.get('/getdatamed/:userid/:time/:date', async (req, res) => {
+  const userId = req.params.userid;
+  const time = req.params.time;
+  const date = req.params.date;
+
+  try {
+    // Fetch all medicine data for the specified user ID
+    const medicineData = await getdata(userId);
+
+    if (!medicineData) {
+      console.log(`No medicine data found for user ID: ${userId}`);
+      return res.status(404).send(`No medicine data found for user ID: ${userId}`);
+    }
+
+    // Filter medicine based on the time and date
+    const filteredMedicine = medicineData.Medicine.filter(medicine => {
+      return (
+        (time === 'Morning' && medicine.Morning) ||
+        (time === 'Noon' && medicine.Noon) ||
+        (time === 'Evening' && medicine.Evening)
+      ) && medicine.MedicDate[date]; // Assuming 'MedicDate' is an object with date keys
+    });
+
+    if (filteredMedicine.length === 0) {
+      return res.send(`No medicine found for ${time} on ${date}`);
+    }
+
+    // Create a response object with the original format
+    const response = {
+      _id: medicineData._id,
+      LineID: medicineData.LineID,
+      Medicine: filteredMedicine
+    };
+
+    // Send the response
+    return res.json(response);
+  } catch (error) {
+    console.error("Error:", error);
+    return res.status(500).send("An unexpected error occurred.", error);
+  } finally {
+    await DisconnectToDatabase();
+  }
+});
+
 
 
 //Snoozeall
