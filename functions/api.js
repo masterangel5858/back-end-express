@@ -28,29 +28,31 @@ const currentDate = getFormattedDate();
 
 
 
-router.get('/getmeddatabydate/:userid/:date', async (req,res)=>{
+router.get('/getmeddatabydate/:userid/:date/:time', async (req, res) => {
   const userId = req.params.userid;
-  const date = req.params.date
+  const date = req.params.date;
+  const time = req.params.time; // New parameter for time
 
   try {
-    // Fetch all medicine data for the specified user ID
-    const medicineData = await fetchMedDatabyDate(userId,date);
-    
+    // Fetch medication data for the specified user ID, date, and time
+    const medicineData = await fetchMedDatabyDate(userId, date, time);
+
     if (!medicineData) {
-        console.log(`No medicine data found for user ID: ${userId}`);
-        return res.status(404).send(`No medicine data found for user ID: ${userId}`);
+      console.log(`No medicine data found for user ID: ${userId}`);
+      return res.status(404).send(`No medicine data found for user ID: ${userId}`);
     }
 
     // Send the fetched medicine data as a response
     return res.json(medicineData);
-} catch (error) {
+  } catch (error) {
     console.error("Error:", error);
-    return res.status(500).send("An unexpected error occurred.",error);
-} finally {
-  await DisconnectToDatabase();
-}
-
+    return res.status(500).send("An unexpected error occurred.", error);
+  } finally {
+    // Disconnect from the database
+    await DisconnectToDatabase();
+  }
 });
+
 
 router.get('/getmanageuser/:userid', async (req,res)=>{
   const userId = req.params.userid;
