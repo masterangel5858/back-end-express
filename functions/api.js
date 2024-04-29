@@ -195,7 +195,8 @@ router.get('/acceptall/:userid/:time/:timestamp', async (req, res) => {
         MedicPicture: medicine.MedicPicture,
         status: medicine.Status,
         datestamp: currentDate,
-        timestamp: currentTime
+        timestamp: currentTime,
+        MatchedTime: time
       };
       insertedMedicines.push(newMedicineData);
       insertData(newMedicineData);
@@ -255,7 +256,8 @@ router.get('/accept/:userid/:MedicName/:timestamp', async (req, res) => {
       MedicPicture: selectedMedicine.MedicPicture,
       Status: selectedMedicine.Status,
       datestamp: currentDate,
-      timestamp: currentTime
+      timestamp: currentTime,
+      MatchedTime: time
     };
     insertData(newMedicineData);
 
