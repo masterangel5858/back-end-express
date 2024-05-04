@@ -336,11 +336,12 @@ router.get('/acceptall/:userid/:time/:timestamp', async (req, res) => {
 
 //Accept
 //accept/userid/MedicID
-router.get('/accept/:userid/:MedicID/:timestamp', async (req, res) => {
+router.get('/accept/:userid/:time/:MedicID/:timestamp', async (req, res) => {
   const userId = req.params.userid;
   const MedicID = req.params.MedicID;
   const timestamp = req.params.timestamp;
   const url = req.url; // Use req.url directly
+  const time = req.params.time;
 
   try {
     console.log('attempt accept one for ' ,userId,MedicID);
