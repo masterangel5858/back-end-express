@@ -317,7 +317,8 @@ router.get('/acceptall/:userid/:time/:timestamp', async (req, res) => {
         status: medicine.Status,
         datestamp: currentDate,
         timestamp: currentTimeString,
-        url: req.url
+        url: req.url,
+        MatchedTime: time
       };
       insertedMedicines.push(newMedicineData);
       await insertData(newMedicineData);
@@ -388,7 +389,8 @@ router.get('/accept/:userid/:MedicID/:timestamp', async (req, res) => {
       Status: selectedMedicine.Status,
       datestamp: currentDate,
       timestamp: currentTimeString,
-      url: req.url
+      url: req.url,
+      MatchedTime: time
     };
     await insertData(newMedicineData);
     await DisconnectToDatabase();
