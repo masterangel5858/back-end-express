@@ -237,7 +237,7 @@ router.get('/snoozeall/:userid/:time/:timestamp', async (req, res) => {
   try {
      // Check if the timestamp has expired
      const currentTime = new Date().getTime();
-     const sessionTimeout = 5 * 60 * 1000; // 5 minutes in milliseconds
+     const sessionTimeout = 10 * 60 * 1000; // 5 minutes in milliseconds
      const requestTime = parseInt(timestamp, 10); // Parse timestamp as integer
  
      if (currentTime - requestTime > sessionTimeout) {
@@ -270,7 +270,7 @@ router.get('/acceptall/:userid/:time/:timestamp', async (req, res) => {
   try {
      // Check if the timestamp has expired (similar to the Snoozeall route)
      const currentTime = new Date().getTime();
-     const sessionTimeout = 5 * 60 * 1000; // 5 minutes in milliseconds
+     const sessionTimeout = 10 * 60 * 1000; // 5 minutes in milliseconds
      const requestTime = parseInt(timestamp, 10);
  
      if (currentTime - requestTime > sessionTimeout) {
@@ -346,7 +346,7 @@ router.get('/accept/:userid/:time/:MedicID/:timestamp', async (req, res) => {
   try {
     console.log('attempt accept one for ' ,userId,MedicID);
     const currentTime = new Date().getTime();
-    const sessionTimeout = 5 * 60 * 1000; // 5 minutes in milliseconds
+    const sessionTimeout = 10 * 60 * 1000; // 5 minutes in milliseconds
     const requestTime = parseInt(timestamp, 10);
 
    if (currentTime - requestTime > sessionTimeout) {
