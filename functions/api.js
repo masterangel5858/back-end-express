@@ -324,9 +324,12 @@ router.get('/acceptall/:userid/:time/:timestamp', async (req, res) => {
 
   // Update the stock using the $set operator based on the stock of each medicine
   // Here, we assume that each medicine in filteredMedicine has a valid stock property
+  const stockUpdates = {};
   filteredMedicine.forEach(medicine => {
-    updateObject.$set[`stock.${medicine.MedicID}`] = medicine.stock;
+    stockUpdates[`stock.${medicine.MedicID}`] = medicine.stock;
   });
+  updateObject.$set = { ...updateObject.$set, ...stockUpdates }; // Merge stock updates with existing $set fields
+  
 
     await connectToDatabase();
 
