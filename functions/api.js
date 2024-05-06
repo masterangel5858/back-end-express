@@ -314,7 +314,7 @@ router.get('/acceptall/:userid/:time/:timestamp', async (req, res) => {
     const filter = {
       LineID: userId,
       MedicID: { $in: filteredMedicine.map(medicine => medicine.MedicID) },
-      urltime: { $eq: timestamp }, // Filter based on equality with the double timestamp
+      urltime: timestamp , 
       MatchedTime: time,
       AcceptStatus: { $ne: true } // Update only if AcceptStatus is not already true
     };
@@ -381,7 +381,7 @@ router.get('/accept/:userid/:MedicID/:timestamp', async (req, res) => {
     const updateFilter = {
       LineID: userId,
       MedicID: MedicID,
-      urltime: { $eq: timestamp }, // Filter based on equality with the double timestamp
+      urltime: timestamp, // Filter based on equality with the double timestamp
       AcceptStatus: { $ne: true } // Exclude documents where AcceptStatus is false
     };
     const updateData = {

@@ -12,20 +12,20 @@ async function checkDuplicateLink(Accepttype, urltime, userId, time, MedicID) {
 
         let query = {
             LineID: userId,
-            AcceptStatus: false
+            AcceptStatus: { $ne: true }
         };
 
         if (Accepttype === "accept") {
             query = {
                 ...query,
                 MedicID: MedicID,
-                urltime
+                urltime: urltime 
             };
         } else if (Accepttype === "acceptall") {
             query = {
                 ...query,
                 MatchedTime: time,
-                urltime
+                urltime: urltime 
             };
         }
 
