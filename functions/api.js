@@ -385,7 +385,7 @@ router.get('/accept/:userid/:MedicID/:timestamp', async (req, res) => {
       datestamp: currentDate,
       urltime:timestamp,
       MatchedTime: time,
-      AcceptStatus: { $ne: false } // Exclude documents where AcceptStatus is false
+      AcceptStatus: { $ne: true } // Exclude documents where AcceptStatus is false
     };
     const updateData = {
       $set: {
