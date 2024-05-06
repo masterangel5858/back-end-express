@@ -312,30 +312,34 @@ router.get('/acceptall/:userid/:time/:timestamp', async (req, res) => {
       AcceptStatus: true
     }
   };
+  await connectToDatabase();
+  for (const medicine of filteredMedicine) {
+    const filter = {
+        LineID: userId,
+        MedicID: medicine.MedicID,
+        urltime: timestamp,
+        MatchedTime: time,
+        AcceptStatus: { $ne: true } // Update only if AcceptStatus is not already true
+    };
 
-  // Prepare the filter for update
-  const filter = {
-    LineID: userId,
-    MedicID: { $in: filteredMedicine.map(medicine => medicine.MedicID) },
-    urltime: timestamp,
-    MatchedTime: time,
-    AcceptStatus: { $ne: true } // Update only if AcceptStatus is not already true
-  };
+    const updateData = {
+        $set: {
+            timestamp: currentTimeString,
+            AcceptType: "acceptall",
+            AcceptStatus: true,
+            stock: medicine.stock // Update the stock field
+        }
+    };
 
-  // Update the stock using the $set operator based on the stock of each medicine
-  // Here, we assume that each medicine in filteredMedicine has a valid stock property
-  const stockUpdates = {};
-  filteredMedicine.forEach(medicine => {
-    stockUpdates[`stock.${medicine.MedicID}`] = medicine.stock;
-  });
-  updateObject.$set = { ...updateObject.$set, ...stockUpdates }; // Merge stock updates with existing $set fields
-  
-
-    await connectToDatabase();
-
-    // Update multiple medicines with the updateMany function
-    await updateMany(filter, updateObject);
-    await DisconnectToDatabase();
+    try {
+        await updateOne(filter, updateData);
+        console.log(`Updated medicine with MedicID ${medicine.MedicID}`);
+    } catch (error) {
+        console.error("Error updating medicine:", error);
+        // Handle the error as needed
+    }
+}
+await DisconnectToDatabase();
 
     // Send the success page after completing the operation
     res.sendFile(successFilePath);
