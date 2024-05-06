@@ -323,6 +323,9 @@ router.get('/acceptall/:userid/:time/:timestamp', async (req, res) => {
         }
     };
 
+    console.log("Filter:", filter);
+    console.log("Update Data:", updateData);
+
     try {
         await updateOne(filter, updateData);
         console.log(`Updated medicine with MedicID ${medicine.MedicID}`);
