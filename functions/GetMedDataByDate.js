@@ -25,6 +25,9 @@ async function getMedDataByDate(LineID, date, matchedTime) {
 
     // Loop through each entry in MedData
     for (const med of MedData) {
+      if (!med) {
+        console.log("Invalid medicine data:", med);
+      }
       const query = {
         "MedicID": med.MedicID,
         [`MedicDate.${date}`]: true,
