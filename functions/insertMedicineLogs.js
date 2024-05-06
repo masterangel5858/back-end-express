@@ -5,7 +5,7 @@ async function insertData(data) {
     try {
         console.log('try to insert data');
         const db = client.db(dbName);
-        const col = db.collection("MedicineLogs_UAT");
+        const col = db.collection("MedicineLogs");
 
         // Insert the data into the collection
         const result = await col.insertOne(data);
@@ -21,7 +21,7 @@ async function updateOne(filter, update) {
     try {
         console.log('try to update data');
         const db = client.db(dbName);
-        const col = db.collection("MedicineLogs_UAT");
+        const col = db.collection("MedicineLogs");
 
         // Update the document in the collection
         const result = await col.updateOne(filter, update);
@@ -37,7 +37,7 @@ async function updateMany(filter, update) {
     try {
         console.log('try to update multiple data');
         const db = client.db(dbName);
-        const col = db.collection("MedicineLogs_UAT");
+        const col = db.collection("MedicineLogs");
 
         // Update multiple documents in the collection
         const result = await col.updateMany(filter, update);

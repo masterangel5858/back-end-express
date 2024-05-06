@@ -8,7 +8,7 @@ async function checkDuplicateLink(Accepttype, urltime, userId, time, MedicID) {
         await connectToDatabase();
         console.log("Checking duplicate link process for ", Accepttype, urltime, userId);
         const db = client.db(dbName);
-        const col = db.collection("MedicineLogs_UAT");
+        const col = db.collection("MedicineLogs");
 
         let query = {
             LineID: userId,
