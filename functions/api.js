@@ -335,7 +335,7 @@ router.get('/acceptall/:userid/:time/:timestamp', async (req, res) => {
 
 //Accept
 //accept/userid/MedicID
-router.get('/accept/:userid/:time/:MedicID/:timestamp', async (req, res) => {
+router.get('/accept/:userid/:MedicID/:timestamp', async (req, res) => {
   const userId = req.params.userid;
   const MedicID = req.params.MedicID;
   const timestamp = req.params.timestamp;

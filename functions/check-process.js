@@ -7,7 +7,7 @@ async function checkDuplicateLink(url, userId) {
         await connectToDatabase();
         console.log("checking link process for ",url , userId);
         const db = client.db(dbName);
-        const col = db.collection("MedicineLogs");
+        const col = db.collection("MedicineLogs_UAT");
 
         // Check if a document with the same link, userId, and time exists within the time range
         const existingLog = await col.findOne({
