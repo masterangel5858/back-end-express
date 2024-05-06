@@ -280,6 +280,7 @@ router.get('/acceptall/:userid/:time/:timestamp', async (req, res) => {
 
     const isDuplicateLink = await checkDuplicateLink("acceptall",timestamp, userId,time);
     if (isDuplicateLink) {
+      console.log("you're been here before")
       return res.sendFile(mutipleclick);
     }
 
@@ -301,25 +302,34 @@ router.get('/acceptall/:userid/:time/:timestamp', async (req, res) => {
       return res.send(`No medicine found for ${time}`);
     }
 
-    // Prepare the update object
-    const updateObject = {
-      $set: {
-        timestamp: currentTimeString,
-        AcceptType:"accept",
-        AcceptStatus: true
-      }
-    };
+    updateStockall(LineID,time)
+    
+  // Prepare the update object
+  const updateObject = {
+    $set: {
+      timestamp: currentTimeString,
+      AcceptType: "accept",
+      AcceptStatus: true
+    }
+  };
 
-    // Prepare the filter for update
-    const filter = {
-      LineID: userId,
-      MedicID: { $in: filteredMedicine.map(medicine => medicine.MedicID) },
-      urltime: timestamp , 
-      MatchedTime: time,
-      AcceptStatus: { $ne: true } // Update only if AcceptStatus is not already true
-    };
+  // Prepare the filter for update
+  const filter = {
+    LineID: userId,
+    MedicID: { $in: filteredMedicine.map(medicine => medicine.MedicID) },
+    urltime: timestamp,
+    MatchedTime: time,
+    AcceptStatus: { $ne: true } // Update only if AcceptStatus is not already true
+  };
+
+  // Update the stock using the $set operator based on the stock of each medicine
+  // Here, we assume that each medicine in filteredMedicine has a valid stock property
+  filteredMedicine.forEach(medicine => {
+    updateObject.$set[`stock.${medicine.MedicID}`] = medicine.stock;
+  });
 
     await connectToDatabase();
+
     // Update multiple medicines with the updateMany function
     await updateMany(filter, updateObject);
     await DisconnectToDatabase();
@@ -356,6 +366,7 @@ router.get('/accept/:userid/:MedicID/:timestamp', async (req, res) => {
      
      const isDuplicateLink = await checkDuplicateLink("accept",timestamp, userId,time,MedicID);
         if (isDuplicateLink) {
+          console.log("you're been here before")
           return res.sendFile(mutipleclick);
         }
 
@@ -388,7 +399,8 @@ router.get('/accept/:userid/:MedicID/:timestamp', async (req, res) => {
       $set: {
         timestamp: currentTimeString,
         AcceptType:"accept",
-        AcceptStatus: true
+        AcceptStatus: true,
+        stock:selectedMedicine.stock
       }
     };
     await updateOne(updateFilter, updateData);
