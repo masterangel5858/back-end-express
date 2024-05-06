@@ -16,6 +16,7 @@ async function checkDuplicateLink(Accepttype,urltime, userId,time,MedicID) {
                 MedicID:MedicID,
                 urltime,
                 LineID: userId,
+                AcceptStatus:false
             });
         }
         else if (Accepttype==="acceptall"){
@@ -23,6 +24,7 @@ async function checkDuplicateLink(Accepttype,urltime, userId,time,MedicID) {
                 MatchedTime:time,
                 urltime,
                 LineID: userId,
+                AcceptStatus:false
             });
         }
         // Check if a document with the same link, userId, and time exists within the time range
