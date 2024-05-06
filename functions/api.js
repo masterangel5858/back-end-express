@@ -1,11 +1,10 @@
 const express = require('express');
-const serverless = require('serverless-http');
 const app = express();
 const port = process.env.PORT || 10000;
 const router = express.Router();
 const { getdata } = require('./GetMedicDetail.js');
 const {  updateStockall,updateMedData, updateStockMed } = require('./updatestock.js');
-const { insertData } = require('./insertMedicineLogs.js');
+const { insertData,updateOne,updateMany } = require('./insertMedicineLogs.js');
 const {getFormattedDate} = require('./setting.js')
 const {fetchuserdata} = require('./GetUser.js')
 const {updateNotifyTime} = require('./GetNotifytime.js')
@@ -23,8 +22,8 @@ const Snooze = path.join(__dirname, 'templates', 'Snooze.html');
 const sessionexpire = path.join(__dirname, 'templates', 'session-expire.html');
 const mutipleclick = path.join(__dirname, 'templates', 'Mutipleclick.html');
 //time config
-const currentTimeString = new Date().toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Bangkok' });
-const currentDate = getFormattedDate();
+
+
 
 
 
@@ -266,23 +265,25 @@ router.get('/acceptall/:userid/:time/:timestamp', async (req, res) => {
   const time = req.params.time;
   const timestamp = req.params.timestamp;
   const url = req.url; // Use req.url directly
+  let currentTimeString = new Date().toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Bangkok' });
+  let currentDate = getFormattedDate();
 
   try {
-     // Check if the timestamp has expired (similar to the Snoozeall route)
-     const currentTime = new Date().getTime();
-     const sessionTimeout = 10 * 60 * 1000; // 5 minutes in milliseconds
-     const requestTime = parseInt(timestamp, 10);
- 
-     if (currentTime - requestTime > sessionTimeout) {
-       return res.sendFile(sessionexpire);
-     }
-     
-     const isDuplicateLink = await checkDuplicateLink(url, userId);
-        if (isDuplicateLink) {
-            return res.sendFile(mutipleclick);
-        }
+    // Check if the timestamp has expired (similar to the Snoozeall route)
+    const currentTime = new Date().getTime();
+    const sessionTimeout = 10 * 60 * 1000; // 10 minutes in milliseconds
+    const requestTime = parseInt(timestamp, 10);
 
-        console.log('attempt accept all for ' ,userId)
+    if (currentTime - requestTime > sessionTimeout) {
+      return res.sendFile(sessionexpire);
+    }
+
+    const isDuplicateLink = await checkDuplicateLink(url, userId);
+    if (isDuplicateLink) {
+      return res.sendFile(mutipleclick);
+    }
+
+    console.log('attempt accept all for ', userId);
     // Fetch medicine data for the specified user ID
     const medicineData = await getdata(userId);
 
@@ -299,33 +300,31 @@ router.get('/acceptall/:userid/:time/:timestamp', async (req, res) => {
     if (filteredMedicine.length === 0) {
       return res.send(`No medicine found for ${time}`);
     }
-    await updateStockall(userId,time);
-    // Insert each medicine into the database
-    await connectToDatabase();
-    const insertedMedicines = [];
-    for (const medicine of filteredMedicine) {
-      const newMedicineData = {
-        LineID: userId,
-        MedicID: medicine.MedicID,
-        MedicName: medicine.MedicName,
-        Morning: medicine.Morning,
-        Noon: medicine.Noon,
-        Evening: medicine.Evening,
-        afbf: medicine.afbf,
-        stock: medicine.stock,
-        MedicPicture: medicine.MedicPicture,
-        status: medicine.Status,
-        datestamp: currentDate,
+
+    // Prepare the update object
+    const updateObject = {
+      $set: {
         timestamp: currentTimeString,
         url: req.url,
-        MatchedTime: time
-      };
-      insertedMedicines.push(newMedicineData);
-      await insertData(newMedicineData);
-    }
+        AcceptStatus: true
+      }
+    };
+
+    // Prepare the filter for update
+    const filter = {
+      LineID: userId,
+      MedicID: { $in: filteredMedicine.map(medicine => medicine.MedicID) },
+      datestamp: currentDate,
+      MatchedTime: time,
+      AcceptStatus: { $ne: true } // Update only if AcceptStatus is not already true
+    };
+
+    await connectToDatabase();
+    // Update multiple medicines with the updateMany function
+    await updateMany(filter, updateObject);
     await DisconnectToDatabase();
 
-    // Send the success page after completing the operations
+    // Send the success page after completing the operation
     res.sendFile(successFilePath);
 
   } catch (error) {
@@ -342,6 +341,8 @@ router.get('/accept/:userid/:time/:MedicID/:timestamp', async (req, res) => {
   const timestamp = req.params.timestamp;
   const url = req.url; // Use req.url directly
   const time = req.params.time;
+  let currentTimeString = new Date().toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Bangkok' });
+  let currentDate = getFormattedDate();
 
   try {
     console.log('attempt accept one for ' ,userId,MedicID);
@@ -377,23 +378,21 @@ router.get('/accept/:userid/:time/:MedicID/:timestamp', async (req, res) => {
     }
     await updateStockMed(userId,MedicID);
     await connectToDatabase();
-    const newMedicineData = {
+    const updateFilter = {
       LineID: userId,
-      MedicID: selectedMedicine.MedicID,
-      MedicName: selectedMedicine.MedicName,
-      Morning: selectedMedicine.Morning,
-      Noon: selectedMedicine.Noon,
-      Evening: selectedMedicine.Evening,
-      afbf: selectedMedicine.afbf,
-      stock: selectedMedicine.stock,
-      MedicPicture: selectedMedicine.MedicPicture,
-      Status: selectedMedicine.Status,
+      MedicID: MedicID,
       datestamp: currentDate,
-      timestamp: currentTimeString,
-      url: req.url,
-      MatchedTime: time
+      MatchedTime: time,
+      AcceptStatus: { $ne: false } // Exclude documents where AcceptStatus is false
     };
-    await insertData(newMedicineData);
+    const updateData = {
+      $set: {
+        timestamp: currentTimeString,
+        url: req.url,
+        AcceptStatus: true
+      }
+    };
+    await updateOne(updateFilter, updateData);
     await DisconnectToDatabase();
 
     // Send the success page after completing the operation
