@@ -302,7 +302,7 @@ router.get('/acceptall/:userid/:time/:timestamp', async (req, res) => {
       return res.send(`No medicine found for ${time}`);
     }
 
-    updateStockall(userId,time);
+    await updateStockall(userId,time);
     
   // Prepare the update object
   const updateObject = {
