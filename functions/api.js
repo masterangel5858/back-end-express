@@ -319,7 +319,7 @@ router.get('/acceptall/:userid/:time/:timestamp', async (req, res) => {
             timestamp: currentTimeString,
             AcceptType: "acceptall",
             AcceptStatus: true,
-            stock: medicine.stock // Update the stock field
+            stock:medicine.stock-1 // Update the stock field
         }
     };
 
@@ -402,7 +402,7 @@ router.get('/accept/:userid/:MedicID/:timestamp', async (req, res) => {
         timestamp: currentTimeString,
         AcceptType:"accept",
         AcceptStatus: true,
-        stock:selectedMedicine.stock
+        stock:selectedMedicine.stock-1
       }
     };
     await updateOne(updateFilter, updateData);
