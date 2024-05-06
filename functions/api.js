@@ -303,15 +303,7 @@ router.get('/acceptall/:userid/:time/:timestamp', async (req, res) => {
     }
 
     await updateStockall(userId,time);
-    
-  // Prepare the update object
-  const updateObject = {
-    $set: {
-      timestamp: currentTimeString,
-      AcceptType: "acceptall",
-      AcceptStatus: true
-    }
-  };
+
   await connectToDatabase();
   for (const medicine of filteredMedicine) {
     const filter = {
