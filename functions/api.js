@@ -302,13 +302,13 @@ router.get('/acceptall/:userid/:time/:timestamp', async (req, res) => {
       return res.send(`No medicine found for ${time}`);
     }
 
-    updateStockall(LineID,time)
+    updateStockall(userId,time);
     
   // Prepare the update object
   const updateObject = {
     $set: {
       timestamp: currentTimeString,
-      AcceptType: "accept",
+      AcceptType: "acceptall",
       AcceptStatus: true
     }
   };
