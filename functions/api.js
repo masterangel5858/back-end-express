@@ -259,7 +259,7 @@ router.get('/snoozeall/:userid/:time/:timestamp', async (req, res) => {
 
 
 //AcceptAll
-//acceptall/:userid/:time
+//acceptall/:userid/:time/:timestamp
 router.get('/acceptall/:userid/:time/:timestamp', async (req, res) => {
   const userId = req.params.userid;
   const time = req.params.time;
@@ -278,7 +278,7 @@ router.get('/acceptall/:userid/:time/:timestamp', async (req, res) => {
       return res.sendFile(sessionexpire);
     }
 
-    const isDuplicateLink = await checkDuplicateLink(url, userId);
+    const isDuplicateLink = await checkDuplicateLink("acceptall",timestamp, userId,time);
     if (isDuplicateLink) {
       return res.sendFile(mutipleclick);
     }
@@ -305,7 +305,7 @@ router.get('/acceptall/:userid/:time/:timestamp', async (req, res) => {
     const updateObject = {
       $set: {
         timestamp: currentTimeString,
-        url: req.url,
+        AcceptType:"accept",
         AcceptStatus: true
       }
     };
@@ -315,6 +315,7 @@ router.get('/acceptall/:userid/:time/:timestamp', async (req, res) => {
       LineID: userId,
       MedicID: { $in: filteredMedicine.map(medicine => medicine.MedicID) },
       datestamp: currentDate,
+      urltime:timestamp,
       MatchedTime: time,
       AcceptStatus: { $ne: true } // Update only if AcceptStatus is not already true
     };
@@ -334,7 +335,7 @@ router.get('/acceptall/:userid/:time/:timestamp', async (req, res) => {
 });
 
 //Accept
-//accept/userid/MedicID
+//accept/userid/MedicID/:timestamp
 router.get('/accept/:userid/:MedicID/:timestamp', async (req, res) => {
   const userId = req.params.userid;
   const MedicID = req.params.MedicID;
@@ -354,7 +355,7 @@ router.get('/accept/:userid/:MedicID/:timestamp', async (req, res) => {
        return res.sendFile(sessionexpire);
      }
      
-     const isDuplicateLink = await checkDuplicateLink(url, userId);
+     const isDuplicateLink = await checkDuplicateLink("accept",timestamp, userId,time,MedicID);
         if (isDuplicateLink) {
           return res.sendFile(mutipleclick);
         }
@@ -382,13 +383,14 @@ router.get('/accept/:userid/:MedicID/:timestamp', async (req, res) => {
       LineID: userId,
       MedicID: MedicID,
       datestamp: currentDate,
+      urltime:timestamp,
       MatchedTime: time,
       AcceptStatus: { $ne: false } // Exclude documents where AcceptStatus is false
     };
     const updateData = {
       $set: {
         timestamp: currentTimeString,
-        url: req.url,
+        AcceptType:"accept",
         AcceptStatus: true
       }
     };
