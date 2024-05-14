@@ -1,5 +1,8 @@
+const { error } = require('console');
 const { getdata, getMedicine } = require('./GetMedicDetail.js');
 const { connectToDatabase, DisconnectToDatabase, client, dbName } = require('./connecteddatabase');
+
+
 async function updateMedData(updatedMedicines) {
     try {
         console.log(updateMedData);
@@ -86,13 +89,20 @@ async function updateStockMed(LineID, MedicID) {
         const targetMedicine = medicine.Medicine.find(med => med.MedicID === MedicID);
 
         if (targetMedicine) {
-            targetMedicine.stock -= 1;
-            console.log(targetMedicine);
-            const packedmedicine = { MedicID: targetMedicine.MedicID, stock: targetMedicine.stock }
+            if (targetMedicine.Status === true){
+                targetMedicine.stock -= 1;
+             console.log(targetMedicine);
+
+                let packedmedicine = { MedicID: targetMedicine.MedicID, stock: targetMedicine.stock };
+                if (targetMedicine.stock === 0) {
+                    packedmedicine.Status = false;
+                }
             console.log("package",packedmedicine)
             await updateMedData([packedmedicine]);
             
             console.log(`Stock for medicine '${MedicID}' updated successfully.`);
+            }
+            else { console.error(`Medicine ${MedicID} is Disable`)}
         } else {
             throw new Error(`Medicine '${MedicID}' not found for LineID '${LineID}'`);
         }

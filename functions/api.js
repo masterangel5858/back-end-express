@@ -155,7 +155,8 @@ router.get('/getdatamed/:userid/:time', async (req, res) => {
     const filteredMedicine = medicineData.Medicine.filter(medicine => {
       return (time === 'Morning' && medicine.Morning) ||
              (time === 'Noon' && medicine.Noon) ||
-             (time === 'Evening' && medicine.Evening);
+             (time === 'Evening' && medicine.Evening)||
+             (time === 'Night' && medicine.Night);
     });
 
     if (filteredMedicine.length === 0) {
@@ -199,7 +200,8 @@ router.get('/getdatamed/:userid/:time/:date', async (req, res) => {
       return (
         (time === 'Morning' && medicine.Morning) ||
         (time === 'Noon' && medicine.Noon) ||
-        (time === 'Evening' && medicine.Evening)
+        (time === 'Evening' && medicine.Evening)||
+        (time === 'Night' && medicine.Night)
       ) && medicine.MedicDate[date]; // Assuming 'MedicDate' is an object with date keys
     });
 
@@ -295,7 +297,8 @@ router.get('/acceptall/:userid/:time/:timestamp', async (req, res) => {
     const filteredMedicine = medicineData.Medicine.filter(medicine => {
       return (time === 'Morning' && medicine.Morning) ||
              (time === 'Noon' && medicine.Noon) ||
-             (time === 'Evening' && medicine.Evening);
+             (time === 'Evening' && medicine.Evening)||
+             (time === 'Night' && medicine.Night);
     });
 
     if (filteredMedicine.length === 0) {
