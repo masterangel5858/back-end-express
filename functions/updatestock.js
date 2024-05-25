@@ -5,29 +5,34 @@ const { connectToDatabase, DisconnectToDatabase, client, dbName } = require('./c
 
 async function updateMedData(updatedMedicines) {
     try {
-        console.log(updateMedData);
+        console.log("updateMedData");
         const db = client.db(dbName);
         const col = db.collection("MedicineList");
-        // Update each document individually
+
         // Construct bulk write operations
         const bulkOperations = updatedMedicines.map(updatedMedicine => ({
             updateOne: {
-                filter: {'MedicID': updatedMedicine.MedicID },
-                update: { $set: { 'stock': updatedMedicine.stock } }
+                filter: { 'MedicID': updatedMedicine.MedicID },
+                update: { 
+                    $set: { 
+                        'stock': updatedMedicine.stock, 
+                        'Status': updatedMedicine.Status !== undefined ? updatedMedicine.Status : true 
+                    } 
+                }
             }
-        }))
+        }));
 
-         // Execute bulk write operations
-         await col.bulkWrite(bulkOperations);
+        // Execute bulk write operations
+        await col.bulkWrite(bulkOperations);
 
-         console.log('Medicine data updated successfully.');
-     } catch (error) {
-         console.error("Error updating medicine data:", error);
-         throw error;
-        } finally {
-            await DisconnectToDatabase();
-        }
+        console.log('Medicine data updated successfully.');
+    } catch (error) {
+        console.error("Error updating medicine data:", error);
+        throw error;
+    } finally {
+        await DisconnectToDatabase();
     }
+}
 
     // async function updateMedData(LineID, updatedMedicines) {
     //     try {
@@ -75,11 +80,10 @@ async function updateMedData(updatedMedicines) {
 //         throw error;
 //     }
 // }
-
 async function updateStockMed(LineID, MedicID) {
     try {
         const medicine = await getMedicine(LineID);
-        console.log('update stock by one ',LineID,MedicID)
+        console.log('update stock by one ', LineID, MedicID);
 
         await connectToDatabase();
         if (!medicine || !medicine.Medicine) {
@@ -89,30 +93,33 @@ async function updateStockMed(LineID, MedicID) {
         const targetMedicine = medicine.Medicine.find(med => med.MedicID === MedicID);
 
         if (targetMedicine) {
-            if (targetMedicine.Status === true){
+            if (targetMedicine.Status === true) {
                 targetMedicine.stock -= 1;
-             console.log(targetMedicine);
+                console.log(targetMedicine);
 
                 let packedmedicine = { MedicID: targetMedicine.MedicID, stock: targetMedicine.stock };
-                if (targetMedicine.stock === 0) {
+                if (targetMedicine.stock <= 0) {
                     packedmedicine.Status = false;
+                } else {
+                    packedmedicine.Status = true;
                 }
-            console.log("package",packedmedicine)
-            await updateMedData([packedmedicine]);
-            
-            console.log(`Stock for medicine '${MedicID}' updated successfully.`);
+                console.log("package", packedmedicine);
+                await updateMedData([packedmedicine]);
+
+                console.log(`Stock for medicine '${MedicID}' updated successfully.`);
+            } else {
+                console.error(`Medicine ${MedicID} is Disabled`);
             }
-            else { console.error(`Medicine ${MedicID} is Disable`)}
         } else {
             throw new Error(`Medicine '${MedicID}' not found for LineID '${LineID}'`);
         }
     } catch (error) {
         console.error('Error updating stock:', error);
         throw error;
-    } finally{
+    } finally {
         console.log("update stock by one Done");
         await DisconnectToDatabase();
-      }
+    }
 }
 
 async function updateStockall(LineID, time) {
